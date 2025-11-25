@@ -1,9 +1,4 @@
 name = "soumya-dahal-portfolio"
 compatibility_date = "2024-11-25"
-
-# Tell Cloudflare Pages where your build output is
 pages_build_output_dir = "dist"
-
-# Bind your domain (this replaces routes and zone settings)
-custom_domain = "soumyadahal.com.np"
 
