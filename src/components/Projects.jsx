@@ -4,7 +4,7 @@ function Projects() {
       title: 'Smart Home Automation System',
       description: 'A modular and scalable system integrating sensors, microcontrollers, and networking to automate and monitor home appliances.',
       tech: 'C, Embedded Hardware, Networking',
-      github: '' // TODO: Add GitHub link
+      github: 'https://github.com/Soumya-Dahal/home-automation'
     },
     {
       title: 'Custom Language Compiler',
