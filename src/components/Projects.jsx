@@ -16,7 +16,7 @@ function Projects() {
       title: 'Image Captioning Model (Go + JavaScript)',
       description: 'An AI-powered image captioning system using Go for backend computation and JavaScript for deployment. Designed for efficiency and lightweight inference.',
       tech: 'Go, JavaScript, Machine Learning',
-      github: '' // TODO: Add GitHub link
+      github: 'https://github.com/Soumya-Dahal/Image-Captioning-GO'
     }
   ]
 
