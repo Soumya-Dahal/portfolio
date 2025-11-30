@@ -32,16 +32,16 @@ function ContactForm() {
     }
 
     try {
-      // Using EmailJS service (you need to sign up at https://www.emailjs.com/)
       const emailData = {
-        service_id: 'service_w6xm9lo', // Replace with your EmailJS service ID
-        template_id: 'template_xwqim3q', // Replace with your EmailJS template ID
-        user_id: '9VILhF0KdA6XIVZjC', // Replace with your EmailJS public key
+        service_id: import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        template_id: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        user_id: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
         template_params: {
           from_name: sanitized.name,
           from_email: sanitized.email,
           message: sanitized.message,
-          to_email: 'dahalsoumya@gmail.com'
+          to_email: 'dahalsoumya@gmail.com',
+          reply_to: sanitized.email
         }
       };
 
@@ -54,17 +54,119 @@ function ContactForm() {
       });
 
       if (res.ok) {
-        setStatus({ type: 'success', message: 'Message sent successfully!' })
+        setStatus({ type: 'success', message: 'Message sent successfully! I\'ll get back to you soon.' })
         setFormData({ name: '', email: '', message: '' })
       } else {
-        throw new Error('Failed to send email')
+        throw new Error('Failed to send email');
       }
     } catch (err) {
-      setStatus({ type: 'error', message: 'Failed to send message. Please try again later.' })
+      console.error('Email error:', err);
+      setStatus({ type: 'error', message: 'Failed to send message. Please try again or email me directly at dahalsoumya@gmail.com' })
     } finally {
       setLoading(false)
     }
   }
 
-  // ... rest of your JSX remains the same ...
+  return (
+    <section id="contact" className="py-20 px-4">
+      <div className="max-w-2xl mx-auto space-y-8">
+        <h2 className="text-4xl md:text-5xl font-bold text-center">Contact</h2>
+        <div className="space-y-4 text-center text-lg">
+          <p>
+            <span className="font-medium">Email:</span>{' '}
+            <a href="mailto:dahalsoumya@gmail.com" className="hover:underline">
+              dahalsoumya@gmail.com
+            </a>
+          </p>
+          <p>
+            <span className="font-medium">GitHub:</span>{' '}
+            <a
+              href="https://github.com/soumyadahal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              github.com/soumyadahal
+            </a>
+          </p>
+          <p>
+            <span className="font-medium">LinkedIn:</span>{' '}
+            <a
+              href="https://www.linkedin.com/in/soumya-dahal-ab749b365"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              linkedin.com/in/soumya-dahal-ab749b365
+            </a>
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6 mt-12" noValidate>
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium mb-2">
+              Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900"
+              required
+              aria-required="true"
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900"
+              required
+              aria-required="true"
+            />
+          </div>
+          <div>
+            <label htmlFor="message" className="block text-sm font-medium mb-2">
+              Message
+            </label>
+            <textarea
+              id="message"
+              value={formData.message}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              rows="5"
+              className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900"
+              required
+              aria-required="true"
+            />
+          </div>
+          {status.message && (
+            <div
+              className={`p-4 ${
+                status.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+              }`}
+              role="alert"
+            >
+              {status.message}
+            </div>
+          )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full px-8 py-3 bg-gray-900 text-white hover:bg-gray-700 transition-colors disabled:opacity-50"
+            aria-label="Send a hello or bug report"
+          >
+            {loading ? 'Sending...' : 'Send a hello (or bug report)'}
+          </button>
+        </form>
+      </div>
+    </section>
+  )
 }
+
+export default ContactForm
