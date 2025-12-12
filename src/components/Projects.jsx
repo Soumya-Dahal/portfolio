@@ -17,7 +17,13 @@ function Projects() {
       description: 'An AI-powered image captioning system using Go for backend computation and JavaScript for deployment. Designed for efficiency and lightweight inference.',
       tech: 'Go, JavaScript, Machine Learning',
       github: 'https://github.com/Soumya-Dahal/Image-Captioning-GO'
-    }
+    },
+        {
+      title: 'Image Classification Model',
+      description: 'Training a image classification model using CNN in intel image classification dataset.',
+      tech: 'Python, tensorflow',
+      github: 'https://github.com/Soumya-Dahal/ImageClassification'
+    },
   ]
 
   return (
