@@ -48,7 +48,7 @@ function ContactForm() {
           const data = await res.json()
           setStatus({ type: 'error', message: data.error || 'Failed to send message' })
         }
-      } catch (err) {
+      } catch {
         setStatus({ type: 'error', message: 'Network error. Please try again.' })
       } finally {
         setLoading(false)
