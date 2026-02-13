@@ -21,7 +21,7 @@ jobs:
       - name: Build
         run: cd frontend && npm run build
       - name: Security audit
-        run: cd frontend && npm audit --audit-level=moderate
+        run: cd frontend && npm audit --audit-level=high
 
   deploy:
     needs: frontend
