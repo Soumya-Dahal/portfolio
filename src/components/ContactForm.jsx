@@ -86,7 +86,7 @@ function ContactForm() {
               rel="noopener noreferrer"
               className="hover:underline"
             >
-              github.com/soumyadahal
+              github.com/Soumya-Dahal
             </a>
           </p>
           <p>
