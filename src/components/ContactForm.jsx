@@ -81,7 +81,7 @@ function ContactForm() {
           <p>
             <span className="font-medium">GitHub:</span>{' '}
             <a
-              href="https://github.com/soumyadahal"
+              href="https://github.com/Soumya-Dahal"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:underline"
