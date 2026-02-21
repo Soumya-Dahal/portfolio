@@ -33,7 +33,7 @@ export function AuthProvider({ children }) {
     if (!supabase) return { error: new Error('Supabase not configured') }
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { shouldCreateUser: true },
+      options: { shouldCreateUser: false },
     })
     return { error }
   }
