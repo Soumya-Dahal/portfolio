@@ -1,22 +1,34 @@
 function Projects() {
   const projects = [
     {
-      title: 'Smart Home Automation System',
-      description: 'A modular and scalable system integrating sensors, microcontrollers, and networking to automate and monitor home appliances.',
-      tech: 'C, Embedded Hardware, Networking',
-      github: '' // TODO: Add GitHub link
+      title: 'Image Captioning (Go + React)',
+      description: 'Image captioning model using a pre-trained VIT encoder and GPT-2 decoder. React frontend with Go backend for efficient, lightweight inference.',
+      tech: 'Go, JavaScript, React, Machine Learning',
+      github: 'https://github.com/Soumya-Dahal/Image-Captioning-GO'
     },
     {
-      title: 'Custom Language Compiler',
-      description: 'A compiler built from scratch, including lexer, parser, and code generation. Focused on performance, memory handling, and clear architecture.',
-      tech: 'C, Compiler Theory',
-      github: '' // TODO: Add GitHub link
+      title: 'Custom Image Captioning Model',
+      description: 'Image captioning system built with a custom model architecture, trained and deployed for generating captions from images.',
+      tech: 'Python, Machine Learning',
+      github: 'https://github.com/Soumya-Dahal/custom_captioning_model'
     },
     {
-      title: 'Image Captioning Model (Go + JavaScript)',
-      description: 'An AI-powered image captioning system using Go for backend computation and JavaScript for deployment. Designed for efficiency and lightweight inference.',
-      tech: 'Go, JavaScript, Machine Learning',
-      github: '' // TODO: Add GitHub link
+      title: 'Home Automation',
+      description: 'Home automation project for controlling and monitoring devices, built with Python.',
+      tech: 'Python',
+      github: 'https://github.com/Soumya-Dahal/home-automation'
+    },
+    {
+      title: 'Image Classification',
+      description: 'Image classification experiments and models developed in Jupyter Notebooks.',
+      tech: 'Python, Jupyter Notebook, Machine Learning',
+      github: 'https://github.com/Soumya-Dahal/ImageClassification'
+    },
+    {
+      title: 'ToDo',
+      description: 'A basic to-do list application for task management.',
+      tech: 'JavaScript',
+      github: 'https://github.com/Soumya-Dahal/ToDo'
     }
   ]
 
