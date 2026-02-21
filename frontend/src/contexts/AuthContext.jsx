@@ -38,6 +38,15 @@ export function AuthProvider({ children }) {
     return { error }
   }
 
+  const signUpWithOtp = async (email) => {
+    if (!supabase) return { error: new Error('Supabase not configured') }
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: true },
+    })
+    return { error }
+  }
+
   const verifyOtp = async (email, token) => {
     if (!supabase) return { error: new Error('Supabase not configured') }
     const { error } = await supabase.auth.verifyOtp({
@@ -80,6 +89,7 @@ export function AuthProvider({ children }) {
     session,
     loading,
     signInWithOtp,
+    signUpWithOtp,
     verifyOtp,
     signInWithPassword,
     signUpWithPassword,
