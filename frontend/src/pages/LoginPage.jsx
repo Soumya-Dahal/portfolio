@@ -8,7 +8,6 @@ function LoginPage() {
     signInWithOtp,
     verifyOtp,
     signInWithPassword,
-    signUpWithPassword,
     updatePassword,
     user,
   } = useAuth()
@@ -86,27 +85,6 @@ function LoginPage() {
       return
     }
     navigate('/downloads', { replace: true })
-  }
-
-  const handleSignUp = async (e) => {
-    e.preventDefault()
-    setError('')
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters')
-      return
-    }
-    if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
-    }
-    setLoading(true)
-    const { error: err } = await signUpWithPassword(email.trim(), password)
-    setLoading(false)
-    if (err) {
-      setError(err.message || 'Sign up failed')
-      return
-    }
-    setMessage('Check your email to confirm your account, then you can log in.')
   }
 
   if (user && mode !== 'set-password') {
