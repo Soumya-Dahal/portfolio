@@ -24,11 +24,11 @@ function Projects() {
       tech: 'Python, Jupyter Notebook, Machine Learning',
       github: 'https://github.com/Soumya-Dahal/ImageClassification'
     },
-    {
-      title: 'ToDo',
-      description: 'A basic to-do list application for task management.',
-      tech: 'JavaScript',
-      github: 'https://github.com/Soumya-Dahal/ToDo'
+        {
+      title: 'DSA in C',
+      description: 'Implementation of basic DSA in C',
+      tech: 'C programming language and DSA concepts',
+      github: 'https://github.com/Soumya-Dahal/DSA-in-C'
     }
   ]
 
