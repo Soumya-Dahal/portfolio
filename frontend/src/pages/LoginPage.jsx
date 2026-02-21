@@ -52,6 +52,10 @@ function LoginPage() {
   const handleLoginOtpRequest = async (e) => {
     e.preventDefault()
     clearFeedback()
+    if (!loginEmail.trim()) {
+      setError('Please enter your email in the Log in form above first.')
+      return
+    }
     setLoading(true)
     const { error: err } = await signInWithOtp(loginEmail.trim())
     setLoading(false)
@@ -195,8 +199,8 @@ function LoginPage() {
                 <button
                   type="button"
                   onClick={handleLoginOtpRequest}
-                  disabled={!loginEmail.trim() || loading}
-                  className="text-gray-900 font-medium underline disabled:opacity-50"
+                  disabled={loading}
+                  className="text-gray-900 font-medium underline hover:no-underline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Send one-time code to my email
                 </button>
