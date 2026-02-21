@@ -96,14 +96,21 @@ function DownloadsPage() {
         {!loading && files.length > 0 && (
           <ul className="space-y-2">
             {files.map(({ name, url }) => (
-              <li key={name}>
+              <li
+                key={name}
+                className="flex items-center justify-between gap-4 py-3 px-4 border border-gray-200 rounded hover:bg-gray-50 hover:border-gray-300"
+              >
+                <span className="text-gray-900 font-medium truncate flex-1 min-w-0">
+                  {name}
+                </span>
                 <a
                   href={url || '#'}
+                  download={name}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block py-3 px-4 border border-gray-200 rounded hover:bg-gray-50 hover:border-gray-300 text-gray-900 font-medium"
+                  className="shrink-0 px-4 py-2 bg-gray-900 text-white text-sm font-medium hover:bg-gray-700 transition-colors"
                 >
-                  {name}
+                  Download
                 </a>
               </li>
             ))}
