@@ -16,9 +16,8 @@ function About() {
           <div className="pt-4">
             <h3 className="text-2xl font-semibold mb-4">Currently Working On:</h3>
             <ul className="list-disc list-inside space-y-2 pl-4">
-              <li>Smart Home Automation System</li>
+              <li>ESP32 WiFi packet sniffer</li>
               <li>Custom Language Compiler</li>
-              <li>Image Captioning Model (Go + JavaScript)</li>
             </ul>
           </div>
           <p className="pt-4 text-xl font-medium">
