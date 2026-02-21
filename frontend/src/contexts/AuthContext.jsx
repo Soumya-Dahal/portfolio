@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 const AuthContext = createContext(null)
 
@@ -9,6 +9,10 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!isSupabaseConfigured || !supabase) {
+      queueMicrotask(() => setLoading(false))
+      return
+    }
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s)
       setUser(s?.user ?? null)
@@ -26,6 +30,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const signInWithOtp = async (email) => {
+    if (!supabase) return { error: new Error('Supabase not configured') }
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: { shouldCreateUser: true },
@@ -34,6 +39,7 @@ export function AuthProvider({ children }) {
   }
 
   const verifyOtp = async (email, token) => {
+    if (!supabase) return { error: new Error('Supabase not configured') }
     const { error } = await supabase.auth.verifyOtp({
       email,
       token,
@@ -43,11 +49,13 @@ export function AuthProvider({ children }) {
   }
 
   const signInWithPassword = async (email, password) => {
+    if (!supabase) return { error: new Error('Supabase not configured') }
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     return { error }
   }
 
   const signUpWithPassword = async (email, password) => {
+    if (!supabase) return { error: new Error('Supabase not configured') }
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -58,12 +66,13 @@ export function AuthProvider({ children }) {
 
   const updatePassword = async (password) => {
     if (!user) return { error: new Error('Not authenticated') }
+    if (!supabase) return { error: new Error('Supabase not configured') }
     const { error } = await supabase.auth.updateUser({ password })
     return { error }
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    if (supabase) await supabase.auth.signOut()
   }
 
   const value = {

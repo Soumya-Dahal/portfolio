@@ -94,6 +94,10 @@ The site supports sign up (email + verification code) and login. Logged-in users
    - `VITE_SUPABASE_ANON_KEY` – the anon public key
 3. In Supabase: **Authentication → URL Configuration** – set **Site URL** and add your app URL to **Redirect URLs**.
 4. **Storage**: Create a **private** bucket named `pdfs`. Add a policy so authenticated users can read (e.g. allow `SELECT` for `auth.role() = 'authenticated'`). Upload PDFs via Storage in the dashboard.
+5. **Production (GitHub Pages):** In your repo go to **Settings → Secrets and variables → Actions**. Add repository secrets:
+   - `VITE_SUPABASE_URL` – your Supabase project URL
+   - `VITE_SUPABASE_ANON_KEY` – your anon public key  
+   The CI workflow uses these when building so login and downloads work on the live site.
 
 ## 📧 Contact Form
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { supabase } from '../lib/supabase'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 const BUCKET_NAME = 'pdfs'
 const SIGNED_URL_EXPIRY = 60
@@ -19,6 +19,13 @@ function DownloadsPage() {
       return
     }
     if (!user) return
+    if (!isSupabaseConfigured || !supabase) {
+      queueMicrotask(() => {
+        setError('Supabase is not configured.')
+        setLoading(false)
+      })
+      return
+    }
 
     let cancelled = false
 
