@@ -82,6 +82,19 @@ Edit these files to customize your portfolio:
 - `frontend/src/components/Certifications.jsx` - Certifications
 - `frontend/src/components/ContactForm.jsx` - Contact information
 
+## 🔐 Login & Downloads (Supabase)
+
+The site supports sign up (email + verification code) and login. Logged-in users can download PDFs from the **Downloads** page.
+
+### Setup
+
+1. Create a project at [supabase.com](https://supabase.com).
+2. In the frontend, copy `.env.example` to `.env` and set:
+   - `VITE_SUPABASE_URL` – your project URL (Settings → API)
+   - `VITE_SUPABASE_ANON_KEY` – the anon public key
+3. In Supabase: **Authentication → URL Configuration** – set **Site URL** and add your app URL to **Redirect URLs**.
+4. **Storage**: Create a **private** bucket named `pdfs`. Add a policy so authenticated users can read (e.g. allow `SELECT` for `auth.role() = 'authenticated'`). Upload PDFs via Storage in the dashboard.
+
 ## 📧 Contact Form
 
 The contact form uses a `mailto:` link to open the user's email client. No backend required!

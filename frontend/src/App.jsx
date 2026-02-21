@@ -1,24 +1,22 @@
-import Hero from './components/Hero'
-import About from './components/About'
-import Skills from './components/Skills'
-import Projects from './components/Projects'
-import Education from './components/Education'
-import Certifications from './components/Certifications'
-import ContactForm from './components/ContactForm'
-import Footer from './components/Footer'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { AuthProvider } from './contexts/AuthContext'
+import Header from './components/Header'
+import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
+import DownloadsPage from './pages/DownloadsPage'
 
 function App() {
   return (
-    <div className="min-h-screen bg-white text-gray-900">
-      <Hero />
-      <About />
-      <Skills />
-      <Projects />
-      <Education />
-      <Certifications />
-      <ContactForm />
-      <Footer />
-    </div>
+    <AuthProvider>
+      <BrowserRouter>
+        <Header />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/downloads" element={<DownloadsPage />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 
