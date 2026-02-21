@@ -5,7 +5,8 @@ function Skills() {
     'Networking',
     'Cybersecurity',
     'Go Development',
-    'JavaScript (Deployment & Frontend)'
+    'JavaScript (Frontend)',
+    'AI/Deep Learning Model Development (TensorFlow, PyTorch)'
   ]
 
   const soft = [
