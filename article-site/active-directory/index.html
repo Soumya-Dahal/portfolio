@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Active Directory architecture, administration, and security hardening." />
+  <title>Active Directory — Soumya Dahal</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖊</text></svg>" />
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────── -->
+  <header class="site-header">
+    <div class="site-wrap">
+      <a href="/" class="site-logo">soumyadahal.com.np</a>
+      <nav>
+        <ul class="site-nav">
+          <li><a href="/">Articles</a></li>
+          <li><a href="mailto:dahalsoumya@gmail.com">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="site-wrap">
+
+      <a href="/" class="article-back">← Back to all articles</a>
+
+      <!-- ── Article Header ─────────────────────── -->
+      <header class="article-header">
+        <div class="card-tags">
+          <span class="tag">Windows</span>
+          <span class="tag">Active Directory</span>
+          <span class="tag">Identity</span>
+        </div>
+        <h1 class="article-title">Active Directory — Architecture, Administration &amp; Security</h1>
+        <p class="article-subtitle">A practical guide to how AD works under the hood and how to keep it from becoming your biggest liability.</p>
+        <div class="article-meta">
+          <span>📅 Last updated: May 2025</span>
+          <span>✍️ Soumya Dahal</span>
+          <span>🏷 Draft</span>
+        </div>
+      </header>
+
+      <!-- ── Table of Contents ──────────────────── -->
+      <nav class="toc" aria-label="Table of contents">
+        <p class="toc-label">Contents</p>
+        <ol>
+          <li><a href="#intro">Introduction</a></li>
+          <li><a href="#architecture">Architecture Overview</a></li>
+          <li><a href="#domains-forests">Domains, Trees &amp; Forests</a></li>
+          <li><a href="#objects">AD Objects: Users, Groups &amp; OUs</a></li>
+          <li><a href="#gpo">Group Policy Objects (GPO)</a></li>
+          <li><a href="#replication">Replication &amp; FSMO Roles</a></li>
+          <li><a href="#authentication">Authentication: Kerberos &amp; NTLM</a></li>
+          <li><a href="#hardening">Hardening &amp; Security Considerations</a></li>
+          <li><a href="#common-attacks">Common Attacks &amp; Mitigations</a></li>
+          <li><a href="#tools">Useful Tools &amp; Commands</a></li>
+        </ol>
+      </nav>
+
+      <!-- ── Article Body ───────────────────────── -->
+      <article class="article-body">
+
+        <h2 id="intro">Introduction</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — write your intro here</p>
+          <p>Describe what Active Directory is, why it exists, and who this article is for.<br />
+          Example: "Active Directory (AD) is Microsoft's directory service for Windows domain networks..."</p>
+        </div>
+
+        <h2 id="architecture">Architecture Overview</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — architecture section</p>
+          <p>Cover the high-level components: domain controllers, LDAP, DNS dependency, schema, global catalog.<br />
+          You can insert a diagram image below using:<br />
+          <code>&lt;img src="../images/ad-architecture.png" alt="AD Architecture diagram" class="article-img" /&gt;</code></p>
+        </div>
+
+        <!-- Example image placeholder — replace src with your actual image -->
+        <!--
+        <img src="../images/ad-architecture.png" alt="Active Directory architecture diagram" class="article-img" />
+        <p class="img-caption">Figure 1 — Active Directory high-level architecture</p>
+        -->
+
+        <h2 id="domains-forests">Domains, Trees &amp; Forests</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — domains, trees, forests</p>
+          <p>Explain the hierarchy: domain → tree → forest. Cover trusts (one-way, two-way, transitive, external, forest).</p>
+        </div>
+
+        <h2 id="objects">AD Objects: Users, Groups &amp; OUs</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — AD objects</p>
+          <p>Cover user accounts, security vs distribution groups, group scopes (local, global, universal), organizational units, computer objects, and service accounts.</p>
+        </div>
+
+        <h2 id="gpo">Group Policy Objects (GPO)</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — GPO section</p>
+          <p>Explain GPO creation, linking, precedence (LSDOU), inheritance, enforcement, and WMI filtering. Add common GPO examples for security baseline.</p>
+        </div>
+
+        <h2 id="replication">Replication &amp; FSMO Roles</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — replication &amp; FSMO</p>
+          <p>Cover AD replication topology, sites and site links, KCC. Explain all 5 FSMO roles: Schema Master, Domain Naming Master, RID Master, PDC Emulator, Infrastructure Master.</p>
+        </div>
+
+        <h2 id="authentication">Authentication: Kerberos &amp; NTLM</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — authentication protocols</p>
+          <p>Walk through the Kerberos TGT/TGS flow with the KDC. Cover NTLM as a fallback and why it's considered legacy. Mention SPNs and delegation.</p>
+        </div>
+
+        <h2 id="hardening">Hardening &amp; Security Considerations</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — hardening</p>
+          <p>Cover: tiered admin model, least privilege, Protected Users group, credential guard, LAPS, SMB signing, disabling NTLMv1, secure LDAP (LDAPS), auditing &amp; logging policies.</p>
+        </div>
+
+        <h2 id="common-attacks">Common Attacks &amp; Mitigations</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — attack techniques &amp; defenses</p>
+          <p>Cover: Pass-the-Hash, Pass-the-Ticket, Kerberoasting, AS-REP Roasting, DCSync, Golden/Silver Tickets, BloodHound attack paths. For each: what it is, how it works, how to detect/mitigate.</p>
+        </div>
+
+        <h2 id="tools">Useful Tools &amp; Commands</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — tools &amp; commands</p>
+          <p>List key tools: PowerShell AD module, RSAT, BloodHound/SharpHound, ldapsearch, nltest, dcdiag, repadmin. Include example commands.</p>
+        </div>
+
+      </article>
+
+    </div>
+  </main>
+
+  <!-- ── Footer ──────────────────────────────── -->
+  <footer class="site-footer">
+    <div class="site-wrap">
+      <span>© 2025 Soumya Dahal</span>
+      <span>
+        <a href="https://github.com/Soumya-Dahal" target="_blank" rel="noopener">GitHub</a>
+        &nbsp;·&nbsp;
+        <a href="mailto:dahalsoumya@gmail.com">Email</a>
+      </span>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Bash scripting from basics to production-ready scripts — variables, control flow, error handling, and more." />
+  <title>Bash Scripting — Soumya Dahal</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖊</text></svg>" />
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────── -->
+  <header class="site-header">
+    <div class="site-wrap">
+      <a href="/" class="site-logo">soumyadahal.com.np</a>
+      <nav>
+        <ul class="site-nav">
+          <li><a href="/">Articles</a></li>
+          <li><a href="mailto:dahalsoumya@gmail.com">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="site-wrap">
+
+      <a href="/" class="article-back">← Back to all articles</a>
+
+      <!-- ── Article Header ─────────────────────── -->
+      <header class="article-header">
+        <div class="card-tags">
+          <span class="tag">Bash</span>
+          <span class="tag">Shell</span>
+          <span class="tag">Scripting</span>
+        </div>
+        <h1 class="article-title">Bash Scripting — From One-Liners to Production Scripts</h1>
+        <p class="article-subtitle">Variables, control flow, functions, error handling, and patterns for writing Bash scripts that actually hold up.</p>
+        <div class="article-meta">
+          <span>📅 Last updated: May 2025</span>
+          <span>✍️ Soumya Dahal</span>
+          <span>🏷 Draft</span>
+        </div>
+      </header>
+
+      <!-- ── Table of Contents ──────────────────── -->
+      <nav class="toc" aria-label="Table of contents">
+        <p class="toc-label">Contents</p>
+        <ol>
+          <li><a href="#intro">Introduction</a></li>
+          <li><a href="#shebang">The Shebang &amp; Script Basics</a></li>
+          <li><a href="#variables">Variables &amp; Data Types</a></li>
+          <li><a href="#control-flow">Control Flow: if, case, loops</a></li>
+          <li><a href="#functions">Functions</a></li>
+          <li><a href="#arguments">Argument Parsing</a></li>
+          <li><a href="#error-handling">Error Handling &amp; set flags</a></li>
+          <li><a href="#io">Input, Output &amp; Redirection</a></li>
+          <li><a href="#string-ops">String Operations &amp; Parameter Expansion</a></li>
+          <li><a href="#arrays">Arrays &amp; Associative Arrays</a></li>
+          <li><a href="#process-sub">Process Substitution &amp; Subshells</a></li>
+          <li><a href="#patterns">Script Patterns &amp; Templates</a></li>
+          <li><a href="#debugging">Debugging Tips</a></li>
+        </ol>
+      </nav>
+
+      <!-- ── Article Body ───────────────────────── -->
+      <article class="article-body">
+
+        <h2 id="intro">Introduction</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — intro</p>
+          <p>When to use Bash vs Python/Go. What makes a good shell script. Scope of this article.</p>
+        </div>
+
+        <h2 id="shebang">The Shebang &amp; Script Basics</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — shebang &amp; basics</p>
+          <p>#!/bin/bash vs #!/usr/bin/env bash. Making scripts executable (chmod +x). Running scripts: ./script.sh vs bash script.sh vs source.<br />
+          Comments. Basic structure of a script file.</p>
+        </div>
+
+        <h2 id="variables">Variables &amp; Data Types</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — variables</p>
+          <p>Assignment (no spaces!), referencing ($VAR, ${VAR}). Quoting: single vs double quotes.<br />
+          Command substitution: $(cmd) vs backticks. Arithmetic: $(( expr )).<br />
+          Special variables: $0, $1-$9, $@, $*, $#, $?, $$, $!.<br />
+          readonly, local, export. Environment variables.</p>
+        </div>
+
+        <h2 id="control-flow">Control Flow: if, case, loops</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — control flow</p>
+          <p>if/elif/else with [ ], [[ ]], and (( )). test command and its flags (-f, -d, -z, -n, -eq, -lt, etc).<br />
+          case statements. for loops (C-style and list-style). while / until loops. break, continue.<br />
+          Include code examples for each.</p>
+        </div>
+
+        <h2 id="functions">Functions</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — functions</p>
+          <p>Defining functions (two syntaxes). Local variables. Return values vs output capture.<br />
+          Passing arguments to functions. Recursive functions. Sourcing function libraries.</p>
+        </div>
+
+        <h2 id="arguments">Argument Parsing</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — argument parsing</p>
+          <p>Manual parsing with shift and case. getopts for short flags. getopt (extended) for long flags.<br />
+          Showing usage/help. Validating required arguments. A reusable argument parsing template.</p>
+        </div>
+
+        <h2 id="error-handling">Error Handling &amp; set Flags</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — error handling</p>
+          <p>set -e (exit on error), set -u (unbound variables), set -o pipefail, set -x (trace/debug).<br />
+          trap for cleanup on exit/signals. ERR trap. Checking exit codes explicitly. Custom error functions.</p>
+        </div>
+
+        <h2 id="io">Input, Output &amp; Redirection</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — I/O &amp; redirection</p>
+          <p>stdin/stdout/stderr (0/1/2). Redirecting: >, >>, 2>, 2>&1, &>. /dev/null.<br />
+          read for user input. Here-documents (heredoc). Pipes and pipelines. tee.</p>
+        </div>
+
+        <h2 id="string-ops">String Operations &amp; Parameter Expansion</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — string operations</p>
+          <p>${#var} (length), ${var:offset:len} (substring), ${var#pattern} / ${var##pattern} (prefix strip),<br />
+          ${var%pattern} / ${var%%pattern} (suffix strip), ${var/search/replace}, ${var^^} / ${var,,} (case).<br />
+          Default values: ${var:-default}, ${var:=default}, ${var:?error}.</p>
+        </div>
+
+        <h2 id="arrays">Arrays &amp; Associative Arrays</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — arrays</p>
+          <p>Indexed arrays: declare -a, assignment, access, iteration, slicing, length.<br />
+          Associative arrays (bash 4+): declare -A, key-value access, iterating keys/values.<br />
+          mapfile / readarray for reading files into arrays.</p>
+        </div>
+
+        <h2 id="process-sub">Process Substitution &amp; Subshells</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — process substitution</p>
+          <p>Subshells with ( ). Process substitution: &lt;(cmd) and &gt;(cmd). Why variables set inside subshells don't propagate. Practical examples.</p>
+        </div>
+
+        <h2 id="patterns">Script Patterns &amp; Templates</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — patterns &amp; templates</p>
+          <p>A solid script boilerplate with: shebang, set flags, trap cleanup, usage function, argument parsing, main().<br />
+          Idempotent scripts. Locking with flock. Logging with timestamps. Color output.</p>
+        </div>
+
+        <h2 id="debugging">Debugging Tips</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — debugging</p>
+          <p>bash -n (syntax check), bash -x (trace). shellcheck and how to use it in CI.<br />
+          set -x / set +x blocks. Printing debug info selectively. Common pitfalls: word splitting, globbing, quoting.</p>
+        </div>
+
+      </article>
+
+    </div>
+  </main>
+
+  <!-- ── Footer ──────────────────────────────── -->
+  <footer class="site-footer">
+    <div class="site-wrap">
+      <span>© 2025 Soumya Dahal</span>
+      <span>
+        <a href="https://github.com/Soumya-Dahal" target="_blank" rel="noopener">GitHub</a>
+        &nbsp;·&nbsp;
+        <a href="mailto:dahalsoumya@gmail.com">Email</a>
+      </span>
+    </div>
+  </footer>
+
+</body>
+</html>

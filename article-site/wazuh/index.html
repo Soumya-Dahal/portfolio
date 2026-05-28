@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Wazuh open-source SIEM and XDR setup, configuration, and tuning guide." />
+  <title>Wazuh — Soumya Dahal</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖊</text></svg>" />
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────── -->
+  <header class="site-header">
+    <div class="site-wrap">
+      <a href="/" class="site-logo">soumyadahal.com.np</a>
+      <nav>
+        <ul class="site-nav">
+          <li><a href="/">Articles</a></li>
+          <li><a href="mailto:dahalsoumya@gmail.com">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="site-wrap">
+
+      <a href="/" class="article-back">← Back to all articles</a>
+
+      <!-- ── Article Header ─────────────────────── -->
+      <header class="article-header">
+        <div class="card-tags">
+          <span class="tag">Security</span>
+          <span class="tag">SIEM</span>
+          <span class="tag">Wazuh</span>
+          <span class="tag">XDR</span>
+        </div>
+        <h1 class="article-title">Wazuh — Open-Source SIEM &amp; XDR Setup Guide</h1>
+        <p class="article-subtitle">Installing, configuring, and tuning Wazuh for host-based intrusion detection, log analysis, vulnerability scanning, and alerting.</p>
+        <div class="article-meta">
+          <span>📅 Last updated: May 2025</span>
+          <span>✍️ Soumya Dahal</span>
+          <span>🏷 Draft</span>
+        </div>
+      </header>
+
+      <!-- ── Table of Contents ──────────────────── -->
+      <nav class="toc" aria-label="Table of contents">
+        <p class="toc-label">Contents</p>
+        <ol>
+          <li><a href="#intro">Introduction &amp; What Is Wazuh</a></li>
+          <li><a href="#architecture">Architecture Overview</a></li>
+          <li><a href="#installation">Installation: Server &amp; Dashboard</a></li>
+          <li><a href="#agents">Deploying Agents</a></li>
+          <li><a href="#log-analysis">Log Collection &amp; Analysis</a></li>
+          <li><a href="#fim">File Integrity Monitoring (FIM)</a></li>
+          <li><a href="#vuln-detection">Vulnerability Detection</a></li>
+          <li><a href="#active-response">Active Response</a></li>
+          <li><a href="#custom-rules">Writing Custom Rules</a></li>
+          <li><a href="#integrations">Integrations: VirusTotal, Slack, PagerDuty</a></li>
+          <li><a href="#tuning">Tuning &amp; Reducing Alert Noise</a></li>
+          <li><a href="#troubleshooting">Troubleshooting &amp; Useful Commands</a></li>
+        </ol>
+      </nav>
+
+      <!-- ── Article Body ───────────────────────── -->
+      <article class="article-body">
+
+        <h2 id="intro">Introduction &amp; What Is Wazuh</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — intro</p>
+          <p>What Wazuh is, what problems it solves. Comparison with paid SIEMs. Key capabilities: HIDS, log analysis, FIM, vulnerability detection, compliance (PCI DSS, HIPAA, etc).<br />
+          Who this guide is for and what the setup will look like by the end.</p>
+        </div>
+
+        <h2 id="architecture">Architecture Overview</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — architecture</p>
+          <p>Three components: Wazuh Server (manager + indexer), Wazuh Dashboard (OpenSearch Dashboards fork), Wazuh Agent.<br />
+          Data flow: agent → manager (port 1514/1515) → indexer → dashboard.<br />
+          Single-node vs cluster deployment. Hardware requirements.<br /><br />
+          You can add a diagram here:<br />
+          <code>&lt;img src="../images/wazuh-architecture.png" alt="Wazuh architecture" class="article-img" /&gt;</code></p>
+        </div>
+
+        <!-- Uncomment and fill in when you have a diagram:
+        <img src="../images/wazuh-architecture.png" alt="Wazuh architecture diagram" class="article-img" />
+        <p class="img-caption">Figure 1 — Wazuh component architecture</p>
+        -->
+
+        <h2 id="installation">Installation: Server &amp; Dashboard</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — server installation</p>
+          <p>Quickstart with the Wazuh installation assistant script vs manual installation.<br />
+          Cover: prerequisites, OS support, the install command, what gets installed, accessing the dashboard.<br />
+          Default credentials. Verifying the cluster is healthy. Firewall ports to open.</p>
+        </div>
+
+        <h2 id="agents">Deploying Agents</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — agent deployment</p>
+          <p>Installing agents on: Linux (deb/rpm), Windows (MSI), macOS.<br />
+          Registering agents: auto-enrollment vs manual. The ossec.conf agent config file.<br />
+          Verifying agent connectivity from the dashboard and from the CLI (agent_control).<br />
+          Mass deployment options: Ansible, Puppet, Group Policy.</p>
+        </div>
+
+        <h2 id="log-analysis">Log Collection &amp; Analysis</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — log analysis</p>
+          <p>Configuring log sources in ossec.conf: &lt;localfile&gt; blocks. Syslog, JSON, multi-line logs.<br />
+          How the decoder + rule pipeline works. Reading alerts in /var/ossec/logs/alerts/.<br />
+          Using the dashboard to search and filter events (Discover view).<br />
+          Adding custom log files (e.g. application logs, nginx access logs).</p>
+        </div>
+
+        <h2 id="fim">File Integrity Monitoring (FIM)</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — FIM</p>
+          <p>How Wazuh's FIM (formerly syscheck) works: scheduled vs real-time vs whodata mode.<br />
+          Configuring directories to monitor, file types, recursion, ignore patterns.<br />
+          Understanding FIM alerts in the dashboard. Alerting on specific file changes.</p>
+        </div>
+
+        <h2 id="vuln-detection">Vulnerability Detection</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — vulnerability detection</p>
+          <p>How the vulnerability detector module works: inventory of installed packages → CVE lookup.<br />
+          Enabling it in ossec.conf. Supported OS targets. Where results appear in the dashboard.<br />
+          Interpreting severity scores. Exporting vulnerability reports.</p>
+        </div>
+
+        <h2 id="active-response">Active Response</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — active response</p>
+          <p>What active response does: automated actions triggered by rules (e.g. firewall-drop on brute-force).<br />
+          Built-in active response scripts. Configuring &lt;active-response&gt; in ossec.conf.<br />
+          Writing a custom active response script. Testing safely in a lab environment.</p>
+        </div>
+
+        <h2 id="custom-rules">Writing Custom Rules</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — custom rules</p>
+          <p>Rule XML structure: &lt;rule id="..." level="..."&gt;. Decoders vs rules.<br />
+          Matching on log content, program name, srcip, user. if_sid, if_matched_sid.<br />
+          Rule frequency and timeframe for detecting repeated events (brute-force pattern).<br />
+          Where to place custom rules: /var/ossec/etc/rules/local_rules.xml.<br />
+          Testing rules with /var/ossec/bin/wazuh-logtest.</p>
+        </div>
+
+        <h2 id="integrations">Integrations: VirusTotal, Slack, PagerDuty</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — integrations</p>
+          <p>VirusTotal integration for file hash lookups on FIM events.<br />
+          Slack/webhook integration for alert notifications.<br />
+          PagerDuty or OpsGenie for on-call alerting.<br />
+          How to configure &lt;integration&gt; blocks in ossec.conf. Using the Wazuh API.</p>
+        </div>
+
+        <h2 id="tuning">Tuning &amp; Reducing Alert Noise</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — tuning</p>
+          <p>This is where most real-world Wazuh work happens. Strategies: raising rule levels, adding ignore rules,<br />
+          fine-tuning FIM exclusions, whitelisting known-good IPs, suppressing noisy built-in rules.<br />
+          Using the Ruleset Testing tab. Setting minimum alert level for notifications.<br />
+          Dashboard saved searches and alert thresholds.</p>
+        </div>
+
+        <h2 id="troubleshooting">Troubleshooting &amp; Useful Commands</h2>
+        <div class="content-placeholder">
+          <p class="ph-label">PLACEHOLDER — troubleshooting</p>
+          <p>Common issues: agent not connecting, indexer out of disk, rules not firing.<br />
+          Key log files: /var/ossec/logs/ossec.log, alerts.log, api.log.<br />
+          Useful commands: agent_control, wazuh-logtest, cluster_control, wazuh-indexer health checks.<br />
+          Restarting services: systemctl restart wazuh-manager / wazuh-dashboard / wazuh-indexer.</p>
+        </div>
+
+      </article>
+
+    </div>
+  </main>
+
+  <!-- ── Footer ──────────────────────────────── -->
+  <footer class="site-footer">
+    <div class="site-wrap">
+      <span>© 2025 Soumya Dahal</span>
+      <span>
+        <a href="https://github.com/Soumya-Dahal" target="_blank" rel="noopener">GitHub</a>
+        &nbsp;·&nbsp;
+        <a href="mailto:dahalsoumya@gmail.com">Email</a>
+      </span>
+    </div>
+  </footer>
+
+</body>
+</html>
