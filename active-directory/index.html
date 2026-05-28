@@ -36,9 +36,9 @@
           <span class="tag">Identity</span>
         </div>
         <h1 class="article-title">Active Directory — Architecture, Administration &amp; Security</h1>
-        <p class="article-subtitle">A practical guide to how AD works under the hood and how to keep it from becoming your biggest liability.</p>
+        <p class="article-subtitle">A guide to how AD works under the hood and how to keep it from becoming your biggest liability.</p>
         <div class="article-meta">
-          <span>📅 Last updated: May 2025</span>
+          <span>📅 Last updated: May 2026</span>
           <span>✍️ Soumya Dahal</span>
           <span>🏷 Draft</span>
         </div>
@@ -66,89 +66,783 @@
 
         <h2 id="intro">Introduction</h2>
         <div class="content-placeholder">
-          <p class="ph-label">PLACEHOLDER — write your intro here</p>
-          <p>Describe what Active Directory is, why it exists, and who this article is for.<br />
-          Example: "Active Directory (AD) is Microsoft's directory service for Windows domain networks..."</p>
-        </div>
+      
 
-        <h2 id="architecture">Architecture Overview</h2>
-        <div class="content-placeholder">
-          <p class="ph-label">PLACEHOLDER — architecture section</p>
-          <p>Cover the high-level components: domain controllers, LDAP, DNS dependency, schema, global catalog.<br />
-          You can insert a diagram image below using:<br />
-          <code>&lt;img src="../images/ad-architecture.png" alt="AD Architecture diagram" class="article-img" /&gt;</code></p>
-        </div>
+<p>
+Active Directory (AD) is Microsoft's directory service for Windows domain networks.
+It acts as a centralized database for users, groups, computers, printers, policies,
+and other network resources. Active Directory securely manages user identities,
+authenticates users, and authorizes access to resources across a network.
+</p>
 
-        <!-- Example image placeholder — replace src with your actual image -->
-        <!--
-        <img src="../images/ad-architecture.png" alt="Active Directory architecture diagram" class="article-img" />
-        <p class="img-caption">Figure 1 — Active Directory high-level architecture</p>
-        -->
+<p>
+Without Active Directory, system administrators would need to manually manage
+user accounts, permissions, and configurations on each individual computer.
+With Active Directory, administration becomes centralized. Administrators can
+create users, organize them into groups, assign permissions to groups, enforce
+security policies, manage devices, and control access to network resources from
+a single location.
+</p>
 
-        <h2 id="domains-forests">Domains, Trees &amp; Forests</h2>
-        <div class="content-placeholder">
-          <p class="ph-label">PLACEHOLDER — domains, trees, forests</p>
-          <p>Explain the hierarchy: domain → tree → forest. Cover trusts (one-way, two-way, transitive, external, forest).</p>
-        </div>
+<h2 id="architecture">Architecture Overview</h2>
 
-        <h2 id="objects">AD Objects: Users, Groups &amp; OUs</h2>
-        <div class="content-placeholder">
-          <p class="ph-label">PLACEHOLDER — AD objects</p>
-          <p>Cover user accounts, security vs distribution groups, group scopes (local, global, universal), organizational units, computer objects, and service accounts.</p>
-        </div>
+<p>
+Many people think that using Active Directory Domain Services (AD DS) means
+you can only work within the Windows ecosystem. This is not true at all.
+Linux systems, macOS devices, printers, NAS devices, and many enterprise
+applications can integrate with Active Directory.
+</p>
 
-        <h2 id="gpo">Group Policy Objects (GPO)</h2>
-        <div class="content-placeholder">
-          <p class="ph-label">PLACEHOLDER — GPO section</p>
-          <p>Explain GPO creation, linking, precedence (LSDOU), inheritance, enforcement, and WMI filtering. Add common GPO examples for security baseline.</p>
-        </div>
+<p>
+To understand this properly, we need to understand the major technologies and
+protocols that make up Active Directory.
+</p>
 
-        <h2 id="replication">Replication &amp; FSMO Roles</h2>
-        <div class="content-placeholder">
-          <p class="ph-label">PLACEHOLDER — replication &amp; FSMO</p>
-          <p>Cover AD replication topology, sites and site links, KCC. Explain all 5 FSMO roles: Schema Master, Domain Naming Master, RID Master, PDC Emulator, Infrastructure Master.</p>
-        </div>
+<p>
+You can think of Active Directory as an interconnection of several important
+components and protocols:
+</p>
 
-        <h2 id="authentication">Authentication: Kerberos &amp; NTLM</h2>
-        <div class="content-placeholder">
-          <p class="ph-label">PLACEHOLDER — authentication protocols</p>
-          <p>Walk through the Kerberos TGT/TGS flow with the KDC. Cover NTLM as a fallback and why it's considered legacy. Mention SPNs and delegation.</p>
-        </div>
+<ol>
+  <li>Kerberos — Authentication protocol</li>
+  <li>LDAP — Directory access and querying protocol</li>
+  <li>DNS — Service discovery and domain location</li>
+  <li>Extensible Storage Engine (ESE) — Database engine</li>
+  <li>Group Policy — Centralized configuration management</li>
+</ol>
+<img src = >
 
-        <h2 id="hardening">Hardening &amp; Security Considerations</h2>
-        <div class="content-placeholder">
-          <p class="ph-label">PLACEHOLDER — hardening</p>
-          <p>Cover: tiered admin model, least privilege, Protected Users group, credential guard, LAPS, SMB signing, disabling NTLMv1, secure LDAP (LDAPS), auditing &amp; logging policies.</p>
-        </div>
+<h3>1. Kerberos Authentication</h3>
 
-        <h2 id="common-attacks">Common Attacks &amp; Mitigations</h2>
-        <div class="content-placeholder">
-          <p class="ph-label">PLACEHOLDER — attack techniques &amp; defenses</p>
-          <p>Cover: Pass-the-Hash, Pass-the-Ticket, Kerberoasting, AS-REP Roasting, DCSync, Golden/Silver Tickets, BloodHound attack paths. For each: what it is, how it works, how to detect/mitigate.</p>
-        </div>
+<p>
+Kerberos is the primary authentication protocol used by Active Directory.
+It provides secure authentication without sending passwords directly over
+the network.
+</p>
+<img src="../images/Active Directory/kerberos.png" alt="kerberos working">
+<p> NOTE: Domain Controller acts as the Kerberos Key Distribution Center (KDC)</p>
 
-        <h2 id="tools">Useful Tools &amp; Commands</h2>
-        <div class="content-placeholder">
-          <p class="ph-label">PLACEHOLDER — tools &amp; commands</p>
-          <p>List key tools: PowerShell AD module, RSAT, BloodHound/SharpHound, ldapsearch, nltest, dcdiag, repadmin. Include example commands.</p>
-        </div>
+<p>
+When a user logs into a domain-joined computer, the following simplified
+process occurs:
+</p>
 
-      </article>
+<ol>
+  <li>The user enters their username and password.</li>
+  <li>The client contacts the Domain Controller (DC).</li>
+  <li>The Domain Controller verifies the credentials.</li>
+  <li>The DC issues a Ticket Granting Ticket (TGT).</li>
+  <li>The user can then request service tickets to access resources such as file servers, printers, or applications.</li>
+</ol>
 
-    </div>
-  </main>
+<p>
+This ticket-based system provides both security and scalability.
+Linux systems can also integrate with Kerberos authentication using tools
+such as SSSD, Winbind, or realmd.<br/>
+Kerberos uses a trusted authentication service known as Key Distribution centre
+It acts as the central authority that verifies identities and issues tickets 
+that allow users and services to communicate securely without repeatedly transmitting 
+passwords across the network. In Active Directory environments, the Domain Controller 
+typically functions as the KDC.
+</p>
 
-  <!-- ── Footer ──────────────────────────────── -->
-  <footer class="site-footer">
-    <div class="site-wrap">
-      <span>© 2025 Soumya Dahal</span>
-      <span>
-        <a href="https://github.com/Soumya-Dahal" target="_blank" rel="noopener">GitHub</a>
-        &nbsp;·&nbsp;
-        <a href="mailto:dahalsoumya@gmail.com">Email</a>
-      </span>
-    </div>
-  </footer>
+<h3>2. LDAP (Lightweight Directory Access Protocol)</h3>
 
-</body>
-</html>
+<p>
+LDAP is the protocol used to query and interact with the Active Directory
+database.
+</p>
+
+<p>
+Applications and administrators use LDAP to:
+</p>
+
+<ul>
+  <li>Search for users and groups</li>
+  <li>Retrieve directory information</li>
+  <li>Modify objects</li>
+  <li>Authenticate users</li>
+  <li>Organize resources</li>
+</ul>
+
+<p>
+For example, when you search for a user in Active Directory Users and Computers,
+the tool communicates with AD using LDAP queries.
+</p>
+
+<p>
+LDAP is platform-independent, which is why Linux applications, web applications,
+VPN servers, Jenkins, GitLab, and many enterprise tools can authenticate users
+against Active Directory.
+</p>
+
+<h3>3. DNS (Domain Name System)</h3>
+
+<p>
+DNS is one of the most important parts of Active Directory and is often overlooked
+by beginners.
+</p>
+
+<p>
+Active Directory heavily depends on DNS to locate Domain Controllers and services.
+When a client wants to log into a domain, it first uses DNS to find the appropriate
+Domain Controller.
+</p>
+
+<p>
+Without properly configured DNS, Active Directory authentication and domain
+services will fail.
+</p>
+
+<p>
+Active Directory commonly uses SRV records in DNS to advertise services such as:
+</p>
+
+<ul>
+  <li>Kerberos authentication services</li>
+  <li>LDAP directory services</li>
+  <li>Global Catalog services</li>
+</ul>
+
+<h3>4. Extensible Storage Engine (ESE)</h3>
+
+<p>
+The Active Directory database itself is stored inside the file:
+</p>
+
+<pre>NTDS.dit</pre>
+
+<p>
+This database uses Microsoft's Extensible Storage Engine (ESE), sometimes called
+JET Blue.
+</p>
+
+<p>
+The database stores:
+</p>
+
+<ul>
+  <li>User accounts</li>
+  <li>Passwords (hashed)</li>
+  <li>Group memberships</li>
+  <li>Computer objects</li>
+  <li>Security policies</li>
+  <li>Organizational Units (OUs)</li>
+</ul>
+
+<p>
+Domain Controllers continuously replicate this database between each other
+to maintain consistency across the environment.
+</p>
+
+<h3>5. Group Policy</h3>
+
+<p>
+Group Policy allows administrators to centrally manage and configure computers
+and users in the domain.
+</p>
+
+<p>
+Using Group Policy, administrators can:
+</p>
+
+<ul>
+  <li>Enforce password policies</li>
+  <li>Disable USB devices</li>
+  <li>Deploy software</li>
+  <li>Configure firewalls</li>
+  <li>Map network drives</li>
+  <li>Run startup scripts</li>
+  <li>Apply security baselines</li>
+</ul>
+
+<p>
+This is one of the most powerful features of Active Directory because it enables
+large scale administration and standardization across thousands of systems.
+</p>
+
+<h3>6. Domain Controller</h2>
+
+<p>
+A Domain Controller (DC) is a server that runs Active Directory Domain Services.
+It stores a copy of the Active Directory database and responds to authentication
+requests from users and computers.
+</p>
+
+<p>
+A Domain Controller is responsible for:
+</p>
+
+<ul>
+  <li>User authentication</li>
+  <li>Authorization</li>
+  <li>Policy enforcement</li>
+  <li>Directory queries</li>
+  <li>Replication</li>
+</ul>
+
+<p>
+In enterprise environments, multiple Domain Controllers are usually deployed
+for redundancy and high availability.
+</p>
+
+<h3>7. Organizational Units (OUs)</h2>
+
+<p>
+Organizational Units (OUs) are containers used to organize objects inside
+Active Directory.
+</p>
+
+<p>
+For example:
+</p>
+
+<pre>
+Company
+ ├── Users
+ ├── Servers
+ ├── HR
+ ├── Finance
+ └── IT
+</pre>
+
+<p>
+Administrators can apply different Group Policies to different OUs, allowing
+fine-grained control over systems and users.
+</p>
+
+<h3>8. Active Directory and Linux</h2>
+
+<p>
+Linux systems can integrate with Active Directory using technologies such as:
+</p>
+
+<ul>
+  <li>SSSD</li>
+  <li>realmd</li>
+  <li>Winbind</li>
+  <li>Samba</li>
+  <li>Kerberos</li>
+</ul>
+
+<p>
+This allows Linux machines to:
+</p>
+
+<ul>
+  <li>Join Active Directory domains</li>
+  <li>Authenticate users using AD credentials</li>
+  <li>Apply centralized access controls</li>
+  <li>Use single sign-on (SSO)</li>
+</ul>
+
+<p>
+This is why Active Directory is widely used even in mixed Windows-Linux
+enterprise environments.
+</p>
+
+```html
+<h2 id="domains-forests">Domains, Trees &amp; Forests</h2>
+
+<p>
+Active Directory uses a hierarchical structure to organize and manage large
+enterprise environments. The hierarchy consists of domains, trees, and forests.
+</p>
+
+<h3>1. Domains</h3>
+
+<p>
+A domain is the fundamental administrative boundary in Active Directory.
+It contains users, groups, computers, policies, and other objects that share
+a centralized directory database and security policies.
+</p>
+
+<p>
+Examples:
+</p>
+
+<pre>
+corp.example.com
+research.example.com
+sales.example.com
+</pre>
+
+<p>
+Each domain has at least one Domain Controller responsible for authentication,
+authorization, and replication. 
+</p>
+
+<h3>2. Trees</h3>
+
+<p>
+A tree is a collection of multiple domains that share a contiguous namespace.
+It is a A Domain Tree is a collection of domains grouped together in a
+hierarchical parent-child structure.
+</p>
+
+<pre>
+example.com
+ ├── sales.example.com
+ ├── hr.example.com
+ └── research.example.com
+</pre>
+
+<p>
+Domains inside a tree automatically establish two-way transitive trust
+relationships with one another.
+</p>
+
+<h3>3. Forests</h3>
+
+<p>
+A forest is the top-level logical structure in Active Directory. A forest can
+contain multiple trees that may or may not share the same namespace.
+</p>
+
+<p>
+All domains inside a forest share:
+</p>
+
+<ul>
+  <li>A common schema</li>
+  <li>A global catalog</li>
+  <li>Forest-wide trust relationships</li>
+</ul>
+<p> 
+  NOTE: The Schema is the blueprint that defines what data can exist, 
+  while the Global Catalog is a distributed index that helps you find 
+  that data across the entire forest.
+</p>
+<p>
+The forest acts as the primary security boundary in Active Directory.
+</p>
+
+<img src = "../images/Active Directory/Domain-tree-forest.png" alt="Domain, tree and forest." >
+
+<p> Note that a single domain (bye.com) is also a part of a tree.</p>
+
+<h3>4. Trust Relationships</h3>
+
+<p>
+Trusts allow users in one domain to access resources in another domain.
+</p>
+
+<ul>
+  <li><strong>One-way trust</strong> — access flows in one direction</li>
+  <li><strong>Two-way trust</strong> — both domains trust each other</li>
+  <li><strong>Transitive trust</strong> — trust extends automatically</li>
+  <li><strong>External trust</strong> — connects separate forests/domains</li>
+  <li><strong>Forest trust</strong> — trust between entire forests</li>
+</ul>
+
+<h2 id="objects">AD Objects: Users, Groups &amp; OUs</h2>
+
+<p>
+Everything stored inside Active Directory is represented as an object.
+Each object contains attributes that describe it.
+</p>
+
+<h3>1. User Accounts</h3>
+
+<p>
+User objects represent identities used for authentication and authorization.
+These accounts can belong to employees, administrators, applications, or services.
+</p>
+
+<h3>2. Groups</h3>
+
+<p>
+Groups simplify permission management by assigning permissions to groups
+instead of individual users.
+</p>
+
+<h4>Security Groups</h4>
+
+<p>
+Used to assign permissions to resources.
+</p>
+
+<h4>Distribution Groups</h4>
+
+<p>
+Used primarily for email distribution lists and cannot assign permissions.
+</p>
+
+<h4>Group Scopes</h4>
+
+<ul>
+  <li><strong>Domain Local</strong> — permissions within a domain</li>
+  <li><strong>Global</strong> — users from the same domain</li>
+  <li><strong>Universal</strong> — users across multiple domains</li>
+</ul>
+
+<h3>3. Organizational Units (OUs)</h3>
+
+<p>
+OUs are containers used to logically organize objects inside Active Directory.
+</p>
+
+<pre>
+Company
+ ├── Servers
+ ├── Workstations
+ ├── HR
+ ├── Finance
+ └── IT
+</pre>
+
+<p>
+Administrators commonly apply Group Policies to OUs.
+</p>
+
+<h3>4. Computer Objects</h3>
+
+<p>
+Domain-joined systems are represented as computer objects inside AD.
+These objects allow centralized management and authentication.
+</p>
+
+<h3>5. Service Accounts</h3>
+
+<p>
+Service accounts are accounts used by applications and services to interact
+with resources securely.
+</p>
+
+<p>
+Modern environments commonly use:
+</p>
+
+<ul>
+  <li>Managed Service Accounts (MSA)</li>
+  <li>Group Managed Service Accounts (gMSA)</li>
+</ul>
+
+<h2 id="gpo">Group Policy Objects (GPO)</h2>
+
+<p>
+Group Policy Objects (GPOs) provide centralized configuration management for
+users and computers.
+</p>
+
+<p>
+Administrators can configure:
+</p>
+
+<ul>
+  <li>Password policies</li>
+  <li>Firewall rules</li>
+  <li>Windows Updates</li>
+  <li>USB restrictions</li>
+  <li>Security baselines</li>
+  <li>Software deployment</li>
+</ul>
+
+<h3>1. GPO Processing Order</h3>
+
+<p>
+Policies are applied using LSDOU order:
+</p>
+
+<pre>
+Local → Site → Domain → Organizational Unit
+</pre>
+
+<p>NOTE:In Active Directory, a Site is a physical boundary based on IP subnets and network connectivity.
+   A Domain is a logical boundary that groups users and computers for central administration, security, 
+   and directory database (NTDS.dit) replication
+<p>
+Policies applied later can override earlier settings.
+</p>
+
+<h3>2. Inheritance &amp; Enforcement</h3>
+
+<p>
+Child OUs inherit policies from parent containers unless inheritance is blocked.
+Administrators can enforce critical policies to prevent overriding.
+</p>
+
+<h3>3. WMI Filtering</h3>
+
+<p>
+WMI filters allow GPOs to target specific operating systems, hardware, or
+system configurations.
+</p>
+
+<h2 id="replication">Replication &amp; FSMO Roles</h2>
+
+<p>
+Active Directory uses multi-master replication, meaning multiple Domain
+Controllers can update the directory database.
+</p>
+
+<h3>1. Replication</h3>
+
+<p>
+Changes made on one Domain Controller replicate to others to maintain
+consistency.
+</p>
+
+<p>
+Replication can occur:
+</p>
+
+<ul>
+  <li>Within a site</li>
+  <li>Between sites</li>
+</ul>
+
+<h3>2. Sites &amp; Site Links</h3>
+
+<p>
+Sites represent physical network locations. Site links control replication
+traffic between locations.
+</p>
+
+<h3>3. KCC (Knowledge Consistency Checker)</h3>
+
+<p>
+The KCC automatically builds replication topologies between Domain Controllers.
+</p>
+
+<h3>4. FSMO Roles</h3>
+
+<p>
+Although AD is multi-master, certain operations are handled by special roles
+known as FSMO (Flexible Single Master Operations) roles.
+</p>
+
+<ul>
+  <li><strong>Schema Master</strong> — controls schema modifications</li>
+  <li><strong>Domain Naming Master</strong> — manages domain additions/removals</li>
+  <li><strong>RID Master</strong> — allocates Relative IDs</li>
+  <li><strong>PDC Emulator</strong> — time sync, password updates, legacy support</li>
+  <li><strong>Infrastructure Master</strong> — updates cross-domain references</li>
+</ul>
+
+<h2 id="authentication">Authentication: Kerberos &amp; NTLM</h2>
+
+<h3>1. Kerberos</h3>
+
+<p>
+Kerberos is the default authentication protocol in modern Active Directory
+environments.
+</p>
+
+<p>
+Kerberos authentication flow:
+</p>
+
+<ol>
+  <li>User authenticates to the Authentication Server (AS)</li>
+  <li>The AS issues a Ticket Granting Ticket (TGT)</li>
+  <li>The client sends the TGT to the Ticket Granting Server (TGS)</li>
+  <li>The TGS issues service tickets</li>
+  <li>The user accesses network services securely</li>
+</ol>
+
+<p>
+The Key Distribution Center (KDC) running on the Domain Controller contains
+both the AS and TGS components.
+</p>
+
+<h3>2. NTLM</h3>
+
+<p>
+NTLM is an older Microsoft authentication protocol still used for compatibility.
+</p>
+
+<p>
+Unlike Kerberos, NTLM relies on challenge-response authentication and does not
+support modern delegation and mutual authentication features.
+</p>
+
+<p>
+Because NTLM is more vulnerable to attacks such as relay attacks and
+pass-the-hash attacks, organizations are encouraged to minimize or disable it.
+</p>
+
+<h3>3. SPNs &amp; Delegation</h3>
+
+<p>
+Service Principal Names (SPNs) uniquely identify services in Kerberos.
+Improper SPN configuration can lead to authentication failures or attacks
+such as Kerberoasting.
+</p>
+
+<h2 id="hardening">Hardening &amp; Security Considerations</h2>
+
+<p>
+Because Active Directory controls authentication and authorization across
+an enterprise, compromising AD often means compromising the entire organization.
+</p>
+
+<h3>4. Security Best Practices</h3>
+
+<ul>
+  <li>Implement least privilege access</li>
+  <li>Use separate admin accounts</li>
+  <li>Enable MFA for privileged users</li>
+  <li>Use tiered administration</li>
+  <li>Disable NTLMv1</li>
+  <li>Enable SMB signing</li>
+  <li>Use LDAPS instead of plain LDAP</li>
+  <li>Rotate local admin passwords using LAPS</li>
+  <li>Enable auditing and centralized logging</li>
+</ul>
+
+<h3>5. Protected Users Group</h3>
+
+<p>
+The Protected Users group provides additional protections for privileged
+accounts by disabling weaker authentication mechanisms.
+</p>
+
+<h3>6. Credential Guard</h3>
+
+<p>
+Credential Guard isolates sensitive credentials using virtualization-based
+security to reduce credential theft.
+</p>
+
+<h2 id="common-attacks">Common Attacks &amp; Mitigations</h2>
+
+<h3>1. Pass-the-Hash</h3>
+
+<p>
+Attackers steal NTLM password hashes and reuse them for authentication without
+knowing the actual password.
+</p>
+
+<p>
+Mitigation:
+</p>
+
+<ul>
+  <li>Use Credential Guard</li>
+  <li>Restrict lateral movement</li>
+  <li>Disable NTLM where possible</li>
+</ul>
+
+<h3>2. Kerberoasting</h3>
+
+<p>
+Attackers request Kerberos service tickets associated with SPNs and attempt
+offline password cracking.
+</p>
+
+<p>
+Mitigation:
+</p>
+
+<ul>
+  <li>Use strong service account passwords</li>
+  <li>Use gMSAs</li>
+  <li>Monitor abnormal ticket requests</li>
+</ul>
+
+<h3>3. AS-REP Roasting</h3>
+
+<p>
+Targets accounts with Kerberos preauthentication disabled.
+</p>
+
+<h3>4. DCSync</h3>
+
+<p>
+Attackers simulate Domain Controller replication to extract password hashes.
+</p>
+
+<p>
+Mitigation:
+</p>
+
+<ul>
+  <li>Restrict replication permissions</li>
+  <li>Monitor replication requests</li>
+</ul>
+
+<h3>5. Golden Ticket</h3>
+
+<p>
+Attackers forge Kerberos TGTs using the KRBTGT account hash.
+</p>
+
+<p>
+Mitigation:
+</p>
+
+<ul>
+  <li>Protect Domain Controllers</li>
+  <li>Rotate KRBTGT passwords after compromise</li>
+</ul>
+
+<h3>6. BloodHound</h3>
+
+<p>
+BloodHound maps Active Directory relationships and attack paths to identify
+privilege escalation opportunities.
+</p>
+
+<h2 id="tools">Useful Tools &amp; Commands</h2>
+
+<h3>1. Windows Administrative Tools</h3>
+
+<ul>
+  <li>Active Directory Users and Computers (ADUC)</li>
+  <li>Group Policy Management Console (GPMC)</li>
+  <li>Active Directory Administrative Center</li>
+  <li>RSAT Tools</li>
+</ul>
+
+<h3>2. PowerShell Commands</h3>
+
+<pre>
+Get-ADUser -Filter *
+Get-ADGroupMember "Domain Admins"
+Get-ADComputer -Filter *
+</pre>
+
+<h3>3. Diagnostic Tools</h3>
+
+<pre>
+dcdiag
+repadmin /replsummary
+nltest /dclist:domain.local
+</pre>
+
+<h3>4. Linux LDAP Queries</h3>
+
+<pre>
+ldapsearch -x -H ldap://dc.domain.local
+</pre>
+
+<h3>5. Security Assessment Tools</h3>
+
+<ul>
+  <li>BloodHound</li>
+  <li>SharpHound</li>
+  <li>PingCastle</li>
+  <li>Mimikatz</li>
+</ul>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>
+Active Directory is one of the most important identity management systems in
+modern enterprise infrastructure. Understanding its architecture, authentication
+mechanisms, administrative model, and security weaknesses is essential for
+system administrators, security engineers, penetration testers, and DevOps
+professionals.
+</p>
+
+<p>
+A properly designed and secured Active Directory environment provides scalable
+centralized identity management, while a poorly secured one can become the
+single point of compromise for an entire organization.<br>
+To see how to setup this in your server click the link below:<br/>
+<a href="https://www.youtube.com/watch?v=Q4I2lKHboDw&t=1871s">Setup AD DS</a>
+</p>
+
+
+
