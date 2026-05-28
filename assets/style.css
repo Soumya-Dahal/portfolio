@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');
-
 /* ── Reset & Base ─────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -8,30 +6,30 @@
   --bg-card:   #141518;
   --bg-hover:  #1a1c20;
   --border:    #2a2c32;
-  --text:      #d4cfc7;
-  --text-dim:  #6e6b66;
-  --text-head: #eae6df;
-  --accent:    #e8824a;
-  --accent-dim:#7a3d1f;
-  --tag-bg:    #1e2028;
-  --tag-text:  #9097a8;
+  --text:      #c9cdd4;
+  --text-dim:  #636870;
+  --text-head: #e8eaed;
+  --accent:    #7eaadc;
+  --accent-dim:#2d4a6e;
+  --tag-bg:    #1a1d23;
+  --tag-text:  #8892a0;
 
-  --font-display: 'Syne', sans-serif;
-  --font-body:    'Crimson Pro', Georgia, serif;
-  --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+  --font-display: Arial, Helvetica, sans-serif;
+  --font-body:    Arial, Helvetica, sans-serif;
+  --font-mono:    'Courier New', Courier, monospace;
 
   --max-w: 780px;
   --col-gap: 2rem;
 }
 
-html { font-size: 18px; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+html { font-size: 17px; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
-  font-weight: 300;
-  line-height: 1.75;
+  font-weight: 400;
+  line-height: 1.7;
   min-height: 100vh;
 }
 
@@ -151,8 +149,8 @@ body {
 
 .index-hero h1 {
   font-family: var(--font-display);
-  font-size: clamp(2.2rem, 5vw, 3.2rem);
-  font-weight: 800;
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  font-weight: 700;
   color: var(--text-head);
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -282,8 +280,8 @@ body {
 
 .article-title {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 2.8rem);
-  font-weight: 800;
+  font-size: clamp(1.7rem, 4vw, 2.3rem);
+  font-weight: 700;
   color: var(--text-head);
   line-height: 1.1;
   letter-spacing: -0.02em;
