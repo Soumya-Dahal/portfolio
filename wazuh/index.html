@@ -39,7 +39,7 @@
         <h1 class="article-title">Wazuh — Open-Source SIEM &amp; XDR Setup Guide</h1>
         <p class="article-subtitle">Installing, configuring, and tuning Wazuh for host-based intrusion detection, log analysis, vulnerability scanning, and alerting.</p>
         <div class="article-meta">
-          <span>📅 Last updated: May 2025</span>
+          <span>📅 Last updated: May 2026</span>
           <span>✍️ Soumya Dahal</span>
           <span>🏷 Draft</span>
         </div>
@@ -69,110 +69,716 @@
 
         <h2 id="intro">Introduction &amp; What Is Wazuh</h2>
         <div class="content-placeholder">
-          <p class="ph-label">PLACEHOLDER — intro</p>
-          <p>What Wazuh is, what problems it solves. Comparison with paid SIEMs. Key capabilities: HIDS, log analysis, FIM, vulnerability detection, compliance (PCI DSS, HIPAA, etc).<br />
-          Who this guide is for and what the setup will look like by the end.</p>
+
+          <p>
+            EDR?, XDR?, SIEM? do these acronyms just sound like a bunch of jibberish?
+            <img src="../images/Wazuh/confused_meme.jpg" alt="confused-meme">
+            These are very simple concepts made difficult by accessive use of acronyms.
+            Let's see what each of these mean.
+          </p>
+
+          <h3>1. Endpoint Detection and Response (EDR)</h3>
+          <p>
+            This is the simplet and the most minimal form of defence in any system.
+            As the name suggests EDR monirots activity on individual devices like
+            laptops, servers and workstations. It watches for malicious processes,
+            file changes, registry modifications, and lateral movement on the
+            endpoint itself.
+          </p>
+          <p>
+            (Lateral movement is a technique an attacker uses to prograssively
+            move through a network after gaining initial access, working
+            towards their ultimate target. Before an attacker hops to another
+            machine, they do significant work on the compromised endpoint itself like
+            escalating privileges, harvesting credentials, and staging their next move.
+            This is the local phase of lateral movement ie lateral movement within a endpoint.)
+          </p>
+          <p>It works in two stages:</p>
+          <ol>
+            <li>Collect: Process tress, file activity, network connections from the device.</li>
+            <li>Responds: Isolates and host, kill a process, roll back changes.</li>
+          </ol>
+          <p>
+            EDR is best is you want deep visibility into what's happening in a machine.
+            It is a minimum security tool every company must use.<br>
+            Example tools are CrowdStrike Falcon, SentinelOne.
+          </p>
+
+          <h3>2. Extended Detection and Response (XDR)</h3>
+          <p>
+            As the name suggests, XDR is an extension of EDR.
+            EDR is scoped to a single endpoint only but XDR has a broader scope
+            of endpoints + networks + cloud + email + identity.<br>
+            XDR correlates *<u>telemetry</u> across the entire environment.
+            Instead of getting alerts from each tool, XDR stiches every alert
+            to give the complete story.
+          </p>
+          <p>
+            (WHAT IS TELEMETRY? It is the automated process of collecting data
+            and from remote sources and transmitting them to a
+            central location for monitoring and analysis).
+          </p>
+          <p>XDR's two step process is:</p>
+          <ol>
+            <li>Collects: endpoints, network traffic, email, cloud workloads, identity providers.</li>
+            <li>Responds: coordinated response across multiple layers simultaneously.</li>
+          </ol>
+          <p>
+            It is best for reducing alert fatigue and seeing the full kill chain.
+            Examples are Palo Alto Cortex XDR, Trend Vision One (which is the flagship
+            product of trend micro), Wazuh platform etc.
+          </p>
+
+          <h3>3. Security Information and Event Management (SIEM)</h3>
+          <p>
+            We saw EDR was scoped to an endpoint, XDR extended the scope to emails,
+            clouds, network and identity providers. This still doesnot cover the
+            entire network of an organization, we expand the scope further now and
+            introduce SEIM.
+            While EDR zooms in on individual devices and XDR connects the
+            dots between a few critical security layers, a SIEM (pronounced "sim")
+            acts as the ultimate brain of a Security Operations Center (SOC).
+            SIEM tools do not just monitor endpoints or networks,
+            they ingest massive quantities of log data from absolutely everywhere
+            in an enterprise ecosystem.
+            This includes domain controllers, firewalls, databases, switches,
+            antivirus software, and custom applications.
+          </p>
+          <p>A SIEM serves two primary functions:</p>
+          <ol>
+            <li>
+              <b>Log Aggregation &amp; Management</b>:
+              Gathering, normalizing, and archiving terabytes of historical logs from
+              diverse sources into a central, searchable repository.
+            </li>
+            <li>
+              <b>Security Analytics &amp; Correlation</b>: Running complex, real-time query
+              rules across those logs to catch sophisticated threats that look innocent
+              in isolation but reveal an attack when viewed together.
+            </li>
+          </ol>
+          <p>
+            <b>The Correlation Difference</b>:
+            If a single user fails a login on a laptop, EDR notes it locally.
+            If that same user fails a login across 40 different servers and a
+            firewall simultaneously, a SIEM flags it as a coordinated brute-force
+            attack.
+          </p>
+          <p>
+            So why even bother with XDR if siem has bigger scope?<br>
+            → SIEM has broader visibility and centralized log analysis,
+            while XDR focuses on deeper detection and faster automated response across
+            integrated security tools.
+          </p>
+          <p>
+            <b>NOTE</b>: A big misconception is that SIEM is a passive tool that
+            cannot take automated action.
+            SIEM platforms can absolutely support automated actions,
+            especially when integrated with SOAR.<br>
+            SOAR stands for Security Orchestration, Automation, and Response.
+            It is a stack of software solutions that allows organizations to
+            streamline their security operations by integrating disjointed tools,
+            automating repetitive tasks, and executing predefined incident response
+            workflows without human intervention.
+          </p>
+
+          <h3>Introducing Wazuh</h3>
+          <p>
+            Wazuh is a popular open source security platform that began as a fork of
+            the OSSEC project. (<a href="https://www.ossec.net/">learn more on ossec</a>)<br>
+            It has now evolved into a unified system by combining SIEM analytics with Host
+            Intrusion Detection and EDR/XDR capabilities.
+          </p>
+          <p><b>Key capabilities of wazuh</b></p>
+          <ol>
+            <li>
+              Log Data Analysis: Wazuh agents extract raw log data from operating systems
+              and applications, while the Wazuh Manager uses built-in
+              "decoders" and rules to parse and alert on malicious behavior
+              in real time.
+            </li>
+            <li>
+              HIDS (Host-Based Intrusion Detection): It monitors system calls,
+              handles rootkit/malware detection,
+              and spots anomalies or indicators of compromise (IoCs)
+              occurring directly on your infrastructure.
+            </li>
+            <li>
+              File Integrity Monitoring (FIM): FIM tracks sensitive directories and registry keys.
+              If an unauthorized user or process creates, modifies, or deletes a critical system file,
+              Wazuh logs the user ID, the application responsible, and triggers an immediate alert.
+            </li>
+            <li>
+              Vulnerability Detection: The Wazuh agent inventories all installed software on an
+              endpoint and correlates it with continuously updated CVE (Common Vulnerabilities and Exposures)
+              databases, highlighting unpatched security flaws automatically.
+            </li>
+            <li>
+              Regulatory Compliance: Out of the box, Wazuh maps its alerts and Security
+              Configuration Assessments (SCA) to major compliance frameworks. Dashboard views can be
+              filtered cleanly by specific control tags for PCI DSS, HIPAA, GDPR, and NIST 800-53,
+              making it incredibly easy to provide audit-ready proof to regulators.
+            </li>
+          </ol>
+
         </div>
 
-        <h2 id="architecture">Architecture Overview</h2>
+        <h2 id="architecture">Wazuh Architecture Overview</h2>
         <div class="content-placeholder">
-          <p class="ph-label">PLACEHOLDER — architecture</p>
-          <p>Three components: Wazuh Server (manager + indexer), Wazuh Dashboard (OpenSearch Dashboards fork), Wazuh Agent.<br />
-          Data flow: agent → manager (port 1514/1515) → indexer → dashboard.<br />
-          Single-node vs cluster deployment. Hardware requirements.<br /><br />
-          You can add a diagram here:<br />
-          <code>&lt;img src="../images/wazuh-architecture.png" alt="Wazuh architecture" class="article-img" /&gt;</code></p>
-        </div>
 
-        <!-- Uncomment and fill in when you have a diagram:
-        <img src="../images/wazuh-architecture.png" alt="Wazuh architecture diagram" class="article-img" />
-        <p class="img-caption">Figure 1 — Wazuh component architecture</p>
-        -->
+          <p>Wazuh has four primary components:</p>
+          <ol>
+            <li>Wazuh server (Manager + Filebeat)</li>
+            <li>Indexer</li>
+            <li>Dashboard</li>
+            <li>Agent</li>
+          </ol>
+          <p>
+            To understand all these, lets take a look at how things flow within wazuh.<br>
+            <img src="../images/Wazuh/wazuh-components.png" alt="wazuh-components">
+          </p>
+
+          <h3>Wazuh Agent</h3>
+          <p>
+            This is the program that is installed on all clients (endpoints). These agents collect
+            logs and send the raw logs to the wazuh server.<br>
+            The primary service is: <code>wazuh-agent</code>
+          </p>
+          <p><b>Important files of agent</b></p>
+          <ul>
+            <li><code>/var/ossec/etc/ossec.conf</code> — Main agent config</li>
+            <li><code>/var/ossec/logs/ossec.log</code> — Agent logs</li>
+            <li><code>/var/ossec/etc/client.keys</code> — Authentication key</li>
+            <li><code>/var/ossec/queue/</code> — Event queues</li>
+            <li><code>/var/ossec/etc/shared/</code> — Shared configs from manager</li>
+          </ul>
+          <p>
+            Agent communicates with manager using 2 ports:<br>
+            TCP port 1514 for agent event/log forwarding<br>
+            TCP port 1515 for agent enrollment
+          </p>
+          <p><b>Overwhelmed? Don't be — we will cover all of these during our lab setup section.</b></p>
+
+          <h3>Wazuh Manager</h3>
+          <p>
+            The main service is: <code>wazuh-manager</code><br>
+            The roles of wazuh manager (and the daemons that perform specific roles) are:
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Daemon</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>wazuh-remoted</td><td>Receives agent logs</td></tr>
+              <tr><td>wazuh-analysisd</td><td>Decoding and rule engine processing</td></tr>
+              <tr><td>wazuh-authd</td><td>Agent enrollment and authentication</td></tr>
+              <tr><td>wazuh-db</td><td>Agent database management</td></tr>
+              <tr><td>wazuh-monitord</td><td>Monitoring and log rotation</td></tr>
+              <tr><td>wazuh-modulesd</td><td>Runs modules like Syscollector and vulnerability detection</td></tr>
+              <tr><td>wazuh-execd</td><td>Executes active response actions</td></tr>
+              <tr><td>wazuh-integratord</td><td>Handles external integrations</td></tr>
+              <tr><td>wazuh-maild</td><td>Sends email alerts</td></tr>
+              <tr><td>wazuh-csyslogd</td><td>Syslog forwarding service</td></tr>
+              <tr><td>wazuh-agentlessd</td><td>Agentless monitoring</td></tr>
+              <tr><td>wazuh-logcollector</td><td>Collects local logs</td></tr>
+              <tr><td>wazuh-apid</td><td>Provides REST API services</td></tr>
+              <tr><td>wazuh-syscheckd</td><td>File Integrity Monitoring (FIM)</td></tr>
+              <tr><td>wazuh-rootcheck</td><td>Rootkit and malware detection</td></tr>
+            </tbody>
+          </table>
+
+          <h3>How Logs Flow Through the Manager</h3>
+
+          <section>
+            <h4>Step 1 — Agent Collects Logs</h4>
+            <p><code>wazuh-logcollector</code> reads logs from:</p>
+            <ul>
+              <li>/var/log/auth.log</li>
+              <li>Windows Event Logs</li>
+              <li>Apache logs</li>
+              <li>Syslog</li>
+              <li>Custom application logs</li>
+            </ul>
+            <p>Configured inside:</p>
+            <pre>
+&lt;localfile&gt;
+  &lt;location&gt;/var/log/auth.log&lt;/location&gt;
+  &lt;log_format&gt;syslog&lt;/log_format&gt;
+&lt;/localfile&gt;</pre>
+            <p>File location:</p>
+            <pre>/var/ossec/etc/ossec.conf</pre>
+          </section>
+
+          <section>
+            <h4>Step 2 — Agent Sends Logs</h4>
+            <p>Agent sends events to the manager using:</p>
+            <pre>1514/TCP</pre>
+            <p>Handled by:</p>
+            <pre>wazuh-remoted</pre>
+          </section>
+
+          <section>
+            <h4>Step 3 — Decoding</h4>
+            <p>The manager passes logs to:</p>
+            <pre>wazuh-analysisd</pre>
+            <p>Analysisd uses:</p>
+            <ul>
+              <li>Decoders</li>
+              <li>Rules</li>
+            </ul>
+
+            <h5>Decoders</h5>
+            <p>Decoders parse raw logs into structured fields.</p>
+            <p>Example log:</p>
+            <pre>Failed password for root from 192.168.1.5</pre>
+            <p>Decoded result:</p>
+            <pre>
+{
+  "user": "root",
+  "srcip": "192.168.1.5"
+}</pre>
+
+            <h5>Important Decoder Locations</h5>
+            <table>
+              <thead>
+                <tr>
+                  <th>Path</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>/var/ossec/ruleset/decoders/</td><td>Default decoders</td></tr>
+                <tr><td>/var/ossec/etc/decoders/</td><td>Custom decoders</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section>
+            <h4>Step 4 — Rules Engine</h4>
+            <p>Parsed logs are matched against XML rules.</p>
+
+            <h5>Rule Files</h5>
+            <table>
+              <thead>
+                <tr>
+                  <th>Path</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>/var/ossec/ruleset/rules/</td><td>Default rules</td></tr>
+                <tr><td>/var/ossec/etc/rules/</td><td>Custom rules</td></tr>
+              </tbody>
+            </table>
+
+            <h5>Example Rule</h5>
+            <pre>
+&lt;rule id="5710" level="5"&gt;
+  &lt;if_sid&gt;5700&lt;/if_sid&gt;
+  &lt;match&gt;Failed password&lt;/match&gt;
+  &lt;description&gt;SSH authentication failed&lt;/description&gt;
+&lt;/rule&gt;</pre>
+          </section>
+
+          <section>
+            <h4>Step 5 — Alert Generation</h4>
+            <p>If a rule matches:</p>
+            <pre>ALERT GENERATED</pre>
+            <p>The alert includes:</p>
+            <ul>
+              <li>Rule ID</li>
+              <li>Severity level</li>
+              <li>Agent name</li>
+              <li>Timestamp</li>
+              <li>Full log</li>
+              <li>MITRE ATT&amp;CK mapping</li>
+              <li>Compliance tags</li>
+            </ul>
+
+            <h5>Alert Files</h5>
+            <table>
+              <thead>
+                <tr>
+                  <th>File</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>/var/ossec/logs/alerts/alerts.log</td><td>Human-readable alerts</td></tr>
+                <tr><td>/var/ossec/logs/alerts/alerts.json</td><td>Structured JSON alerts</td></tr>
+              </tbody>
+            </table>
+
+            <h5>Archive File</h5>
+            <table>
+              <thead>
+                <tr><th>File</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>/var/ossec/logs/archives/archives.json</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section>
+            <h3>Filebeat</h3>
+            <p>Service: <code>filebeat</code></p>
+            <p>Filebeat is installed on the Wazuh server.</p>
+            <p>Its job:</p>
+            <pre>Read alerts.json → Send to Indexer</pre>
+
+            <h4>Important Filebeat Files</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>File</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>/etc/filebeat/filebeat.yml</td><td>Main Filebeat config</td></tr>
+                <tr><td>/etc/filebeat/certs/</td><td>TLS certificates</td></tr>
+                <tr><td>/usr/share/filebeat/module/wazuh/</td><td>Wazuh module</td></tr>
+                <tr><td>/var/log/filebeat/</td><td>Filebeat logs</td></tr>
+              </tbody>
+            </table>
+
+            <h4>Filebeat Workflow</h4>
+            <div class="flow">
+<pre>alerts.json
+     ↓
+Filebeat reads JSON
+     ↓
+Converts to OpenSearch docs
+     ↓
+Sends HTTPS requests
+     ↓
+Indexer stores documents</pre>
+            </div>
+
+            <h4>Port Used</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>Port</th>
+                  <th>Protocol</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>9200</td><td>HTTPS</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section>
+            <h3>Wazuh Indexer</h3>
+            <p>Service: <code>wazuh-indexer</code></p>
+            <p>Based on:</p>
+            <ul>
+              <li>OpenSearch</li>
+              <li>Elasticsearch lineage</li>
+            </ul>
+
+            <h4>Internal Components</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Index engine</td><td>Stores documents</td></tr>
+                <tr><td>Query engine</td><td>Searches alerts</td></tr>
+                <tr><td>Shards/replicas</td><td>Scalability</td></tr>
+                <tr><td>ISM</td><td>Index lifecycle management</td></tr>
+                <tr><td>REST API</td><td>Dashboard/API access</td></tr>
+              </tbody>
+            </table>
+
+            <h4>Important Indexer Files</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>File</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>/etc/wazuh-indexer/opensearch.yml</td><td>Main configuration</td></tr>
+                <tr><td>/etc/wazuh-indexer/jvm.options</td><td>JVM memory settings</td></tr>
+                <tr><td>/usr/share/wazuh-indexer/</td><td>Core binaries</td></tr>
+                <tr><td>/var/log/wazuh-indexer/</td><td>Indexer logs</td></tr>
+              </tbody>
+            </table>
+
+            <h4>Index Patterns</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>Index</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>wazuh-alerts-*</td><td>Security alerts</td></tr>
+                <tr><td>wazuh-archives-*</td><td>All raw events</td></tr>
+                <tr><td>wazuh-monitoring-*</td><td>Agent status</td></tr>
+                <tr><td>wazuh-statistics-*</td><td>Wazuh statistics</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section>
+            <h3>How Indexing Works</h3>
+
+            <h4>Example JSON</h4>
+            <pre>
+{
+  "rule": {
+    "level": 5,
+    "description": "SSH login failed"
+  },
+  "agent": {
+    "name": "ubuntu-server"
+  }
+}</pre>
+
+            <h4>Indexer Processing</h4>
+            <ul>
+              <li>Receives JSON over REST API</li>
+              <li>Maps fields</li>
+              <li>Creates searchable documents</li>
+              <li>Stores data in indices</li>
+              <li>Builds inverted indexes</li>
+            </ul>
+
+            <h4>Capabilities Enabled</h4>
+            <ul>
+              <li>Fast searching</li>
+              <li>Aggregations</li>
+              <li>Dashboards</li>
+              <li>Filtering</li>
+              <li>Threat hunting</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Wazuh Dashboard</h3>
+            <p>Service: <code>wazuh-dashboard</code></p>
+            <p>Based on:</p>
+            <ul>
+              <li>OpenSearch Dashboards</li>
+              <li>Kibana-like interface</li>
+            </ul>
+
+            <h4>Important Dashboard Files</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>File</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>/etc/wazuh-dashboard/opensearch_dashboards.yml</td><td>Main dashboard configuration</td></tr>
+                <tr><td>/usr/share/wazuh-dashboard/plugins/wazuh/</td><td>Wazuh plugin</td></tr>
+                <tr><td>/var/log/wazuh-dashboard/</td><td>Dashboard logs</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section>
+            <h3>Dashboard Communication</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Destination</th>
+                  <th>Purpose</th>
+                  <th>Port</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Wazuh API</td><td>Manager information/configuration</td><td>55000</td></tr>
+                <tr><td>Wazuh Indexer</td><td>Alert search and visualization</td><td>9200</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section>
+            <h3>Full End-to-End Event Flow</h3>
+            <div class="flow">
+<pre>1.  Attacker attempts SSH login
+          ↓
+2.  auth.log updated
+          ↓
+3.  wazuh-logcollector reads log
+          ↓
+4.  Agent sends event to manager (1514/TCP)
+          ↓
+5.  wazuh-remoted receives event
+          ↓
+6.  wazuh-analysisd decodes log
+          ↓
+7.  Rules matched
+          ↓
+8.  Alert generated
+          ↓
+9.  alerts.json updated
+          ↓
+10. Filebeat reads alerts.json
+          ↓
+11. Sends HTTPS JSON to indexer (9200)
+          ↓
+12. Indexer indexes document
+          ↓
+13. Dashboard queries index
+          ↓
+14. Alert visible in UI</pre>
+            </div>
+          </section>
+
+          <section>
+            <h3>Important Wazuh Configuration Files</h3>
+
+            <h4>Core Files</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>File</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>/var/ossec/etc/ossec.conf</td><td>Main Wazuh configuration</td></tr>
+                <tr><td>/var/ossec/etc/client.keys</td><td>Agent authentication</td></tr>
+                <tr><td>/var/ossec/etc/local_internal_options.conf</td><td>Advanced tuning</td></tr>
+                <tr><td>/var/ossec/etc/internal_options.conf</td><td>Internal settings</td></tr>
+              </tbody>
+            </table>
+
+            <h4>Rules and Decoders</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>Path</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>/var/ossec/ruleset/rules/</td><td>Default rules</td></tr>
+                <tr><td>/var/ossec/etc/rules/</td><td>Custom rules</td></tr>
+                <tr><td>/var/ossec/ruleset/decoders/</td><td>Default decoders</td></tr>
+                <tr><td>/var/ossec/etc/decoders/</td><td>Custom decoders</td></tr>
+              </tbody>
+            </table>
+
+            <h4>Logging Files</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>File</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>/var/ossec/logs/ossec.log</td><td>Main manager log</td></tr>
+                <tr><td>/var/ossec/logs/alerts/alerts.json</td><td>Structured alerts</td></tr>
+                <tr><td>/var/ossec/logs/alerts/alerts.log</td><td>Text alerts</td></tr>
+                <tr><td>/var/ossec/logs/archives/archives.json</td><td>All archived logs</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+        </div>
 
         <h2 id="installation">Installation: Server &amp; Dashboard</h2>
         <div class="content-placeholder">
           <p class="ph-label">PLACEHOLDER — server installation</p>
-          <p>Quickstart with the Wazuh installation assistant script vs manual installation.<br />
-          Cover: prerequisites, OS support, the install command, what gets installed, accessing the dashboard.<br />
+          <p>Quickstart with the Wazuh installation assistant script vs manual installation.<br>
+          Cover: prerequisites, OS support, the install command, what gets installed, accessing the dashboard.<br>
           Default credentials. Verifying the cluster is healthy. Firewall ports to open.</p>
         </div>
 
         <h2 id="agents">Deploying Agents</h2>
         <div class="content-placeholder">
           <p class="ph-label">PLACEHOLDER — agent deployment</p>
-          <p>Installing agents on: Linux (deb/rpm), Windows (MSI), macOS.<br />
-          Registering agents: auto-enrollment vs manual. The ossec.conf agent config file.<br />
-          Verifying agent connectivity from the dashboard and from the CLI (agent_control).<br />
+          <p>Installing agents on: Linux (deb/rpm), Windows (MSI), macOS.<br>
+          Registering agents: auto-enrollment vs manual. The ossec.conf agent config file.<br>
+          Verifying agent connectivity from the dashboard and from the CLI (agent_control).<br>
           Mass deployment options: Ansible, Puppet, Group Policy.</p>
         </div>
 
         <h2 id="log-analysis">Log Collection &amp; Analysis</h2>
         <div class="content-placeholder">
           <p class="ph-label">PLACEHOLDER — log analysis</p>
-          <p>Configuring log sources in ossec.conf: &lt;localfile&gt; blocks. Syslog, JSON, multi-line logs.<br />
-          How the decoder + rule pipeline works. Reading alerts in /var/ossec/logs/alerts/.<br />
-          Using the dashboard to search and filter events (Discover view).<br />
+          <p>Configuring log sources in ossec.conf: &lt;localfile&gt; blocks. Syslog, JSON, multi-line logs.<br>
+          How the decoder + rule pipeline works. Reading alerts in /var/ossec/logs/alerts/.<br>
+          Using the dashboard to search and filter events (Discover view).<br>
           Adding custom log files (e.g. application logs, nginx access logs).</p>
         </div>
 
         <h2 id="fim">File Integrity Monitoring (FIM)</h2>
         <div class="content-placeholder">
           <p class="ph-label">PLACEHOLDER — FIM</p>
-          <p>How Wazuh's FIM (formerly syscheck) works: scheduled vs real-time vs whodata mode.<br />
-          Configuring directories to monitor, file types, recursion, ignore patterns.<br />
+          <p>How Wazuh's FIM (formerly syscheck) works: scheduled vs real-time vs whodata mode.<br>
+          Configuring directories to monitor, file types, recursion, ignore patterns.<br>
           Understanding FIM alerts in the dashboard. Alerting on specific file changes.</p>
         </div>
 
         <h2 id="vuln-detection">Vulnerability Detection</h2>
         <div class="content-placeholder">
           <p class="ph-label">PLACEHOLDER — vulnerability detection</p>
-          <p>How the vulnerability detector module works: inventory of installed packages → CVE lookup.<br />
-          Enabling it in ossec.conf. Supported OS targets. Where results appear in the dashboard.<br />
+          <p>How the vulnerability detector module works: inventory of installed packages → CVE lookup.<br>
+          Enabling it in ossec.conf. Supported OS targets. Where results appear in the dashboard.<br>
           Interpreting severity scores. Exporting vulnerability reports.</p>
         </div>
 
         <h2 id="active-response">Active Response</h2>
         <div class="content-placeholder">
           <p class="ph-label">PLACEHOLDER — active response</p>
-          <p>What active response does: automated actions triggered by rules (e.g. firewall-drop on brute-force).<br />
-          Built-in active response scripts. Configuring &lt;active-response&gt; in ossec.conf.<br />
+          <p>What active response does: automated actions triggered by rules (e.g. firewall-drop on brute-force).<br>
+          Built-in active response scripts. Configuring &lt;active-response&gt; in ossec.conf.<br>
           Writing a custom active response script. Testing safely in a lab environment.</p>
         </div>
 
         <h2 id="custom-rules">Writing Custom Rules</h2>
         <div class="content-placeholder">
           <p class="ph-label">PLACEHOLDER — custom rules</p>
-          <p>Rule XML structure: &lt;rule id="..." level="..."&gt;. Decoders vs rules.<br />
-          Matching on log content, program name, srcip, user. if_sid, if_matched_sid.<br />
-          Rule frequency and timeframe for detecting repeated events (brute-force pattern).<br />
-          Where to place custom rules: /var/ossec/etc/rules/local_rules.xml.<br />
+          <p>Rule XML structure: &lt;rule id="..." level="..."&gt;. Decoders vs rules.<br>
+          Matching on log content, program name, srcip, user. if_sid, if_matched_sid.<br>
+          Rule frequency and timeframe for detecting repeated events (brute-force pattern).<br>
+          Where to place custom rules: /var/ossec/etc/rules/local_rules.xml.<br>
           Testing rules with /var/ossec/bin/wazuh-logtest.</p>
         </div>
 
         <h2 id="integrations">Integrations: VirusTotal, Slack, PagerDuty</h2>
         <div class="content-placeholder">
           <p class="ph-label">PLACEHOLDER — integrations</p>
-          <p>VirusTotal integration for file hash lookups on FIM events.<br />
-          Slack/webhook integration for alert notifications.<br />
-          PagerDuty or OpsGenie for on-call alerting.<br />
+          <p>VirusTotal integration for file hash lookups on FIM events.<br>
+          Slack/webhook integration for alert notifications.<br>
+          PagerDuty or OpsGenie for on-call alerting.<br>
           How to configure &lt;integration&gt; blocks in ossec.conf. Using the Wazuh API.</p>
         </div>
 
         <h2 id="tuning">Tuning &amp; Reducing Alert Noise</h2>
         <div class="content-placeholder">
           <p class="ph-label">PLACEHOLDER — tuning</p>
-          <p>This is where most real-world Wazuh work happens. Strategies: raising rule levels, adding ignore rules,<br />
-          fine-tuning FIM exclusions, whitelisting known-good IPs, suppressing noisy built-in rules.<br />
-          Using the Ruleset Testing tab. Setting minimum alert level for notifications.<br />
+          <p>This is where most real-world Wazuh work happens. Strategies: raising rule levels, adding ignore rules,<br>
+          fine-tuning FIM exclusions, whitelisting known-good IPs, suppressing noisy built-in rules.<br>
+          Using the Ruleset Testing tab. Setting minimum alert level for notifications.<br>
           Dashboard saved searches and alert thresholds.</p>
         </div>
 
         <h2 id="troubleshooting">Troubleshooting &amp; Useful Commands</h2>
         <div class="content-placeholder">
           <p class="ph-label">PLACEHOLDER — troubleshooting</p>
-          <p>Common issues: agent not connecting, indexer out of disk, rules not firing.<br />
-          Key log files: /var/ossec/logs/ossec.log, alerts.log, api.log.<br />
-          Useful commands: agent_control, wazuh-logtest, cluster_control, wazuh-indexer health checks.<br />
+          <p>Common issues: agent not connecting, indexer out of disk, rules not firing.<br>
+          Key log files: /var/ossec/logs/ossec.log, alerts.log, api.log.<br>
+          Useful commands: agent_control, wazuh-logtest, cluster_control, wazuh-indexer health checks.<br>
           Restarting services: systemctl restart wazuh-manager / wazuh-dashboard / wazuh-indexer.</p>
         </div>
 
