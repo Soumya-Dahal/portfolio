@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>AD_Samba_FileServer_Guide</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<p><strong>Active Directory &amp; Samba File Server</strong></p>
+<p>Complete Setup Guide from Scratch</p>
+<p><em>Ubuntu Server · Windows Server · Kali Linux</em></p>
+<p><strong>Lab Environment</strong></p>
+<p>Domain: SDWIN.LOCAL | DC: 192.168.122.100 | File Server:
+192.168.122.181</p>
+<p>Gateway: 192.168.122.1 | Subnet: 192.168.122.0/24</p>
+<p><strong>Core Concepts</strong></p>
+<p>Before diving into commands, understand what each technology does and
+why it exists.</p>
+<p><strong>What is Active Directory (AD)?</strong></p>
+<p>Active Directory is Microsoft's directory service that runs on
+Windows Server. It acts as a central authority that:</p>
+<ul>
+<li><p>Stores all user accounts, passwords, and groups in one
+place</p></li>
+<li><p>Authenticates users when they log in (via Kerberos
+protocol)</p></li>
+<li><p>Controls what resources (files, printers, systems) each user can
+access</p></li>
+<li><p>Manages computers joined to the domain</p></li>
+</ul>
+<p>The Windows Server running AD is called a Domain Controller (DC).
+Every machine in the domain trusts the DC for authentication.</p>
+<p><strong>What is Samba?</strong></p>
+<p>Samba is an open-source implementation of the SMB (Server Message
+Block) protocol — the same protocol Windows uses for file sharing. Samba
+allows Linux machines to:</p>
+<ul>
+<li><p>Share folders that Windows and Linux clients can access like
+network drives</p></li>
+<li><p>Join an Active Directory domain and be recognized as a domain
+member</p></li>
+<li><p>Authenticate users against AD (so domain users can access Linux
+shares)</p></li>
+</ul>
+<p><strong>What is Winbind?</strong></p>
+<p>Winbind is a component of Samba that acts as a bridge between Linux
+and Windows AD. It:</p>
+<ul>
+<li><p>Translates Windows user/group identities (SIDs) into Linux user
+IDs (UIDs/GIDs)</p></li>
+<li><p>Allows Linux to resolve AD usernames and groups (like getent
+passwd)</p></li>
+<li><p>Handles authentication requests against the DC</p></li>
+</ul>
+<p>Without Winbind, Linux would not know what to do with Windows domain
+users trying to access its file shares.</p>
+<p><strong>What is Kerberos?</strong></p>
+<p>Kerberos is the authentication protocol used by AD. When a user logs
+in, the DC issues a ticket. Other machines in the domain accept this
+ticket as proof of identity — no password needs to be sent over the
+network. This is why time sync matters: tickets have timestamps, and a
+clock difference of more than 5 minutes causes Kerberos to reject
+authentication.</p>
+<p><strong>ID Mapping (idmap) — Why it matters</strong></p>
+<p>Windows identifies users by SIDs (Security Identifiers) like
+S-1-5-21-...-1001. Linux uses numeric UIDs/GIDs. Winbind must map
+between these. The smb.conf idmap config controls this:</p>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 70%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>tdb (default *)</strong></td>
+<td>Simple key-value store for ID mappings. Consistent and reliable for
+single-domain labs. Use this as the default backend.</td>
+</tr>
+<tr class="even">
+<td><strong>autorid (avoid as default)</strong></td>
+<td>Dynamically assigns IDs per domain. Can produce different GIDs for
+the same group depending on lookup method — causes
+NT_STATUS_ACCESS_DENIED even when group membership is correct.</td>
+</tr>
+<tr class="odd">
+<td><strong>rid (domain-specific)</strong></td>
+<td>Derives Linux UID from the Windows RID (last number of SID).
+Predictable and stable.</td>
+</tr>
+<tr class="even">
+<td><strong>range</strong></td>
+<td>The pool of Linux UIDs/GIDs this backend can assign. Must not
+overlap between backends.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><em>⚠ Use tdb (not autorid) as the default * backend for
+single-domain labs. autorid can assign different GIDs for the same group
+depending on lookup method, causing permission errors even when group
+membership is correct. Also: tdb not tbd — easy typo that causes silent
+failures.</em></p>
+</blockquote>
+<p><strong>SMB Share Permissions — Syntax Explained</strong></p>
+<p>In smb.conf, permissions are written in octal notation:</p>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 70%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>create mask = 0660</strong></td>
+<td>Permissions for new files. 0 = octal prefix. 6 = owner rw. 6 = group
+rw. 0 = others none.</td>
+</tr>
+<tr class="even">
+<td><strong>directory mask = 0770</strong></td>
+<td>Permissions for new directories. 7 = rwx (execute = enter
+directory).</td>
+</tr>
+<tr class="odd">
+<td><strong>chmod 2770</strong></td>
+<td>The leading 2 is setgid — new files/dirs inherit the group
+automatically.</td>
+</tr>
+<tr class="even">
+<td><strong>valid users = @"SDWIN\\Finance"</strong></td>
+<td>@ means group. SDWIN\\Finance is the AD domain\group. Only this
+group can connect.</td>
+</tr>
+</tbody>
+</table>
+<p>Octal permission digits: 4 = Read, 2 = Write, 1 = Execute. So 6 = 4+2
+(rw), 7 = 4+2+1 (rwx).</p>
+<p><strong>Part 1: Connecting Windows Client & Domain Controller Setup</strong></p>
+<p>This section covers connecting a Windows computer to the domain and
+setting up AD groups. Your DC should already be installed with Active
+Directory Domain Services (AD DS).</p>
+<p> If you haven't setup your Active Directory yet, click <a href="https://www.youtube.com/watch?v=Q4I2lKHboDw&t=1872s">here</a>
+<p><strong>Connecting a Windows Computer to the Domain</strong></p>
+<p>Do this on any Windows client machine you want to join to
+SDWIN.LOCAL.</p>
+<blockquote>
+<p><strong>Step 1 Set DNS to point to the DC</strong></p>
+</blockquote>
+<p>Control Panel → Network and Sharing Center → Change adapter settings
+→ Right-click NIC → Properties → IPv4:</p>
+<blockquote>
+<p>IP Address: 192.168.122.x (unique IP for this machine)</p>
+<p>Subnet Mask: 255.255.255.0</p>
+<p>Default Gateway: 192.168.122.1</p>
+<p>Preferred DNS: 192.168.122.100 &lt;-- your DC</p>
+<p>Alternate DNS: 8.8.8.8 &lt;-- fallback</p>
+<p><em>⚠ The DNS must point to the DC. AD uses DNS to locate domain
+services (Kerberos, LDAP). Without this, joining will fail.</em></p>
+<p><strong>Step 2 Join the Domain</strong></p>
+</blockquote>
+<p>Right-click This PC → Properties → Advanced system settings →
+Computer Name → Change:</p>
+<ul>
+<li><p>Select: Member of Domain</p></li>
+<li><p>Type: SDWIN.LOCAL</p></li>
+<li><p>Enter Administrator credentials when prompted</p></li>
+<li><p>Restart the computer</p></li>
+</ul>
+<blockquote>
+<p><em>✓ After restart, log in with domain credentials: SDWIN\username
+or username@SDWIN.LOCAL</em></p>
+</blockquote>
+<p><strong>Creating AD Groups and Users</strong></p>
+<p>On the Domain Controller, open Active Directory Users and Computers
+(dsa.msc).</p>
+<blockquote>
+<p><strong>Step 1 Create Groups</strong></p>
+</blockquote>
+<ol type="1">
+<li><p>Expand your domain → right-click on an OU (e.g. Users) → New →
+Group</p></li>
+<li><p>Group name: Finance | Group scope: Global | Group type:
+Security</p></li>
+<li><p>Repeat for HR and IT groups</p></li>
+</ol>
+<blockquote>
+<p><strong>Step 2 Create Users</strong></p>
+</blockquote>
+<ol start="4" type="1">
+<li><p>Right-click OU → New → User</p></li>
+<li><p>Fill in First name, Last name, User logon name (e.g.
+finance1)</p></li>
+<li><p>Set a password, uncheck 'User must change password at next logon'
+for lab use</p></li>
+</ol>
+<blockquote>
+<p><strong>Step 3 Add Users to Groups</strong></p>
+</blockquote>
+<ol start="7" type="1">
+<li><p>Double-click the Finance group → Members tab → Add</p></li>
+<li><p>Type the username (e.g. finance1) → Check Names → OK</p></li>
+</ol>
+<p>Verify from CMD on any domain machine:</p>
+<blockquote>
+<p>net user finance1 /domain</p>
+</blockquote>
+<p><strong>Configure DNS Forwarder on DC</strong></p>
+<p>So your DC (and all domain machines using it as DNS) can resolve
+internet addresses:</p>
+<ol start="9" type="1">
+<li><p>Open DNS Manager on Windows Server</p></li>
+<li><p>Right-click your server name → Properties → Forwarders
+tab</p></li>
+<li><p>Add: 8.8.8.8 and 1.1.1.1</p></li>
+<li><p>Click OK</p></li>
+</ol>
+<blockquote>
+<p><em>✓ This allows the DC to forward non-local DNS queries (like
+google.com) to public DNS.</em></p>
+</blockquote>
+<p><strong>Part 2: Ubuntu Server — Network &amp; Hostname</strong></p>
+<p><strong>Configure Static IP with Netplan</strong></p>
+<p>Edit the netplan configuration file (filename may vary, check with ls
+/etc/netplan/):</p>
+<blockquote>
+<p>sudo nano /etc/netplan/01-netcfg.yaml</p>
+<p>network:</p>
+<p>version: 2</p>
+<p>ethernets:</p>
+<p>enp1s0: # use your actual NIC name (ip a)</p>
+<p>dhcp4: no</p>
+<p>addresses:</p>
+<p>- 192.168.122.181/24</p>
+<p>gateway4: 192.168.122.1</p>
+<p>nameservers:</p>
+<p>addresses:</p>
+<p>- 192.168.122.100 # DC as primary DNS</p>
+<p>- 8.8.8.8 # fallback</p>
+<p>search:</p>
+<p>- SDWIN.LOCAL</p>
+<p><em>⚠ Use spaces, never tabs in YAML. Indentation errors cause
+'invalid YAML' on netplan apply. The nameservers block sits at the same
+indent level as addresses — both under the NIC name.</em></p>
+<p>sudo netplan apply</p>
+<p>ping 192.168.122.100 # verify DC is reachable</p>
+<p>nslookup SDWIN.LOCAL # verify DNS resolves the domain</p>
+</blockquote>
+<p><strong>Set Hostname</strong></p>
+<blockquote>
+<p>sudo hostnamectl set-hostname SD-Ubuntu.SDWIN.LOCAL</p>
+</blockquote>
+<p>Update /etc/hosts so the FQDN is listed first:</p>
+<blockquote>
+<p>sudo nano /etc/hosts</p>
+<p>127.0.0.1 localhost</p>
+<p>127.0.1.1 SD-Ubuntu.SDWIN.LOCAL SD-Ubuntu</p>
+<p>192.168.122.181 SD-Ubuntu.SDWIN.LOCAL SD-Ubuntu</p>
+<p>::1 ip6-localhost ip6-loopback</p>
+<p>fe00::0 ip6-localnet</p>
+<p>ff00::0 ip6-mcastprefix</p>
+<p>ff02::1 ip6-allnodes</p>
+<p>ff02::2 ip6-allrouters</p>
+<p><em>⚠ The FQDN must come before the short hostname on each line.
+Samba warns and DNS update fails if this is wrong.</em></p>
+<p>hostname # should return: SD-Ubuntu.SDWIN.LOCAL</p>
+<p>hostname -f # should return: SD-Ubuntu.SDWIN.LOCAL</p>
+</blockquote>
+<p><strong>Configure Kerberos</strong></p>
+<blockquote>
+<p>sudo nano /etc/krb5.conf</p>
+<p>[libdefaults]</p>
+<p>default_realm = SDWIN.LOCAL</p>
+<p>dns_lookup_realm = false</p>
+<p>dns_lookup_kdc = true</p>
+<p><em>⚠ Kerberos requires clocks to be within 5 minutes of the DC. If
+time is off: sudo apt install ntpdate -y &amp;&amp; sudo ntpdate
+192.168.122.100</em></p>
+</blockquote>
+<p><strong>Part 3: Ubuntu Server — Samba File Server</strong></p>
+<p><strong>Install Packages</strong></p>
+<blockquote>
+<p>sudo apt update</p>
+<p>sudo apt install samba winbind libpam-winbind libnss-winbind -y</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 70%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>samba</strong></td>
+<td>The file sharing server — implements SMB protocol</td>
+</tr>
+<tr class="even">
+<td><strong>winbind</strong></td>
+<td>Bridges Linux and AD — resolves domain users/groups, handles
+auth</td>
+</tr>
+<tr class="odd">
+<td><strong>libpam-winbind</strong></td>
+<td>Allows PAM (login system) to authenticate via winbind</td>
+</tr>
+<tr class="even">
+<td><strong>libnss-winbind</strong></td>
+<td>Allows NSS (name service) to look up AD users with getent</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Configure /etc/samba/smb.conf</strong></p>
+<p>First backup the original:</p>
+<blockquote>
+<p>sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.bak</p>
+</blockquote>
+<p>Edit the [global] section only — do not delete the rest of the
+file:</p>
+<blockquote>
+<p>sudo nano /etc/samba/smb.conf</p>
+<p>[global]</p>
+<p>workgroup = SDWIN # NetBIOS name of domain (no .LOCAL)</p>
+<p>realm = SDWIN.LOCAL # Full Kerberos realm (uppercase)</p>
+<p>security = ADS # Use Active Directory for auth</p>
+<p>winbind use default domain = yes # Allow 'username' instead of
+'SDWIN\username'</p>
+<p>winbind offline logon = no # Don't cache credentials offline</p>
+<p>log file = /var/log/samba/log.%m</p>
+<p>logging = file</p>
+<p>max log size = 1000</p>
+<p>panic action = /usr/share/samba/panic-action %d</p>
+<p>template shell = /bin/bash # Shell for AD users on Linux</p>
+<p>template homedir = /home/%U # Home dir template for AD users</p>
+<p>idmap config * : backend = tdb # Simple consistent mapping — use tdb
+not autorid</p>
+<p>idmap config * : range = 0-999999 # ID pool for non-SDWIN
+domains/objects</p>
+<p>idmap config SDWIN : backend = rid # Domain-specific: derive UID from
+Windows RID</p>
+<p>idmap config SDWIN : range = 1000000-1999999 # Must not overlap with
+* range above</p>
+<p><em>⚠ security = ADS is what makes Ubuntu a domain member. Without it
+(e.g. security = USER), Samba runs standalone and net ads join will fail
+saying 'not configured as member server'.</em></p>
+</blockquote>
+<p>Verify config:</p>
+<blockquote>
+<p>testparm</p>
+<p><em>✓ testparm should show 'Server role: ROLE_DOMAIN_MEMBER'. If it
+shows ROLE_STANDALONE, security = ADS is missing or wrong.</em></p>
+</blockquote>
+<p><strong>Join Ubuntu to the AD Domain</strong></p>
+<blockquote>
+<p>sudo net ads join -U Administrator</p>
+</blockquote>
+<p>Enter the Administrator password. Successful output ends with:</p>
+<blockquote>
+<p>Joined 'SD-UBUNTU' to dns domain 'SDWIN.LOCAL'</p>
+</blockquote>
+<p>Verify the join:</p>
+<blockquote>
+<p>sudo net ads testjoin</p>
+<p><em>⚠ If join fails with 'This operation is only allowed for the
+PDC': security = ADS is missing. If it fails with Kerberos errors: fix
+time sync first.</em></p>
+</blockquote>
+<p><strong>Configure NSSwitch</strong></p>
+<p>Tell Linux to use winbind when looking up users and groups:</p>
+<blockquote>
+<p>sudo nano /etc/nsswitch.conf</p>
+</blockquote>
+<p>Change these two lines:</p>
+<blockquote>
+<p># Before:</p>
+<p>passwd: files systemd</p>
+<p>group: files systemd</p>
+<p># After:</p>
+<p>passwd: files systemd winbind</p>
+<p>group: files systemd winbind</p>
+<p><em>✓ Without this change, getent passwd and getent group will not
+return AD users/groups even if winbind is working.</em></p>
+</blockquote>
+<p><strong>Start and Enable Services</strong></p>
+<blockquote>
+<p>sudo systemctl restart smbd nmbd winbind</p>
+<p>sudo systemctl enable smbd nmbd winbind</p>
+</blockquote>
+<p>Verify AD users are now visible:</p>
+<blockquote>
+<p>wbinfo -u # list all AD users</p>
+<p>wbinfo -g # list all AD groups</p>
+<p>wbinfo -i finance1 # look up a specific user</p>
+<p>getent passwd 'SDWIN\\finance1' # resolve user via NSS</p>
+</blockquote>
+<p><strong>Create Shared Folders</strong></p>
+<blockquote>
+<p>sudo mkdir -p /srv/shares/finance</p>
+<p>sudo mkdir -p /srv/shares/hr</p>
+<p>sudo mkdir -p /srv/shares/it</p>
+</blockquote>
+<p>Add share definitions to smb.conf (after the [global] section):</p>
+<blockquote>
+<p>[Finance]</p>
+<p>path = /srv/shares/finance</p>
+<p>browseable = yes # visible when listing shares</p>
+<p>read only = no # allow write</p>
+<p>valid users = @"SDWIN\\Finance" # @ = group. Only Finance group
+members</p>
+<p>create mask = 0660 # new files: owner rw, group rw, others none</p>
+<p>directory mask = 0770 # new dirs: owner rwx, group rwx, others
+none</p>
+<p>[HR]</p>
+<p>path = /srv/shares/hr</p>
+<p>browseable = yes</p>
+<p>read only = no</p>
+<p>valid users = @"SDWIN\\HR"</p>
+<p>create mask = 0660</p>
+<p>directory mask = 0770</p>
+<p>[IT]</p>
+<p>path = /srv/shares/it</p>
+<p>browseable = yes</p>
+<p>read only = no</p>
+<p>valid users = @"SDWIN\\IT"</p>
+<p>create mask = 0660</p>
+<p>directory mask = 0770</p>
+</blockquote>
+<p><strong>Set Folder Ownership and Permissions</strong></p>
+<blockquote>
+<p># First find the correct GID for each AD group:</p>
+<p>wbinfo --sid-to-gid $(wbinfo --name-to-sid 'SDWIN\Finance')</p>
+<p>wbinfo --sid-to-gid $(wbinfo --name-to-sid 'SDWIN\HR')</p>
+<p>wbinfo --sid-to-gid $(wbinfo --name-to-sid 'SDWIN\IT')</p>
+<p># Use the GID numbers returned above (example output: 1001110,
+1001111, 1001112)</p>
+<p>sudo chown root:1001110 /srv/shares/finance # replace with your
+Finance GID</p>
+<p>sudo chown root:1001111 /srv/shares/hr # replace with your HR GID</p>
+<p>sudo chown root:1001112 /srv/shares/it # replace with your IT GID</p>
+<p>sudo chmod 2770 /srv/shares/finance</p>
+<p>sudo chmod 2770 /srv/shares/hr</p>
+<p>sudo chmod 2770 /srv/shares/it</p>
+<p>ls -la /srv/shares/ # verify ownership</p>
+<p><em>⚠ The leading 2 in 2770 is setgid. It ensures any new file
+created inside the share inherits the group (Finance/HR/IT)
+automatically, so group permissions stay consistent.</em></p>
+<p>sudo systemctl restart smbd nmbd winbind</p>
+<p>testparm</p>
+</blockquote>
+<p><strong>Part 4: Kali Linux — Join Domain with Samba</strong></p>
+<p>Kali uses Samba/Winbind only (not realmd/sssd) for AD integration.
+This is appropriate for penetration testing environments.</p>
+<p><strong>Install Packages</strong></p>
+<blockquote>
+<p>sudo apt update</p>
+<p>sudo apt install samba winbind libpam-winbind libnss-winbind
+krb5-user -y</p>
+</blockquote>
+<p>When prompted for Kerberos realm, enter: SDWIN.LOCAL</p>
+<p><strong>Configure smb.conf on Kali</strong></p>
+<blockquote>
+<p>sudo nano /etc/samba/smb.conf</p>
+<p>[global]</p>
+<p>workgroup = SDWIN</p>
+<p>realm = SDWIN.LOCAL</p>
+<p>security = ADS</p>
+<p>winbind use default domain = yes</p>
+<p>winbind offline logon = no</p>
+<p>template shell = /bin/bash</p>
+<p>template homedir = /home/%U</p>
+<p>idmap config * : backend = tdb</p>
+<p>idmap config * : range = 0-999999</p>
+<p>idmap config SDWIN : backend = rid</p>
+<p>idmap config SDWIN : range = 1000000-1999999</p>
+<p>testparm # should show ROLE_DOMAIN_MEMBER</p>
+</blockquote>
+<p><strong>Configure Kerberos on Kali</strong></p>
+<blockquote>
+<p>sudo nano /etc/krb5.conf</p>
+<p>[libdefaults]</p>
+<p>default_realm = SDWIN.LOCAL</p>
+<p>dns_lookup_realm = false</p>
+<p>dns_lookup_kdc = true</p>
+</blockquote>
+<p><strong>Set DNS and Hostname on Kali</strong></p>
+<p>Point DNS to the DC (edit /etc/resolv.conf or network manager):</p>
+<blockquote>
+<p>sudo nano /etc/resolv.conf</p>
+<p>nameserver 192.168.122.100</p>
+<p>search SDWIN.LOCAL</p>
+<p>sudo hostnamectl set-hostname kali.SDWIN.LOCAL</p>
+<p>sudo nano /etc/hosts</p>
+<p># Add: 192.168.122.x kali.SDWIN.LOCAL kali</p>
+</blockquote>
+<p><strong>Join Kali to the Domain</strong></p>
+<blockquote>
+<p>sudo net ads join -U Administrator</p>
+<p>sudo net ads testjoin</p>
+</blockquote>
+<p>Configure NSSwitch:</p>
+<blockquote>
+<p>sudo nano /etc/nsswitch.conf</p>
+<p>passwd: files systemd winbind</p>
+<p>group: files systemd winbind</p>
+<p>sudo systemctl restart winbind</p>
+<p>wbinfo -u # verify AD users visible</p>
+<p>wbinfo -g # verify AD groups visible</p>
+</blockquote>
+<p><strong>Access Samba Shares from Kali (Without Joining
+Domain)</strong></p>
+<p>If you only want to test shares without joining, use smbclient
+directly:</p>
+<blockquote>
+<p># List all shares on the file server</p>
+<p>smbclient -L //192.168.122.181 -U 'SDWIN\\finance1'</p>
+<p># Connect to Finance share</p>
+<p>smbclient //192.168.122.181/Finance -U 'SDWIN\\finance1'</p>
+<p># Test denied user</p>
+<p>smbclient //192.168.122.181/Finance -U 'SDWIN\\hruser1'</p>
+<p># Should return: NT_STATUS_ACCESS_DENIED</p>
+</blockquote>
+<p>Commands inside the smbclient prompt:</p>
+<blockquote>
+<p>ls # list files</p>
+<p>put file.txt # upload file</p>
+<p>get file.txt # download file</p>
+<p>mkdir testdir # create directory</p>
+<p>exit # quit</p>
+</blockquote>
+<p>Query AD users from Kali using rpcclient (no domain join needed):</p>
+<blockquote>
+<p>rpcclient -U 'SDWIN\\Administrator' 192.168.122.100</p>
+<p># Inside rpcclient prompt:</p>
+<p>enumdomusers # list all AD users</p>
+<p>enumdomgroups # list all AD groups</p>
+</blockquote>
+<p><strong>Part 5: Testing File Share Access</strong></p>
+<p><strong>From Windows Client</strong></p>
+<p>Open File Explorer and navigate to:</p>
+<blockquote>
+<p>\\\\192.168.122.181\\Finance</p>
+</blockquote>
+<p>Log in with a Finance group member (e.g. SDWIN\finance1). Access
+should be granted. Try with a user not in Finance — access should be
+denied.</p>
+<p><strong>From Ubuntu (smbclient)</strong></p>
+<blockquote>
+<p>smbclient //192.168.122.181/Finance -U 'SDWIN\\finance1'</p>
+</blockquote>
+<p><strong>Verify AD Resolution on Ubuntu File Server</strong></p>
+<blockquote>
+<p>wbinfo -u # list all AD users</p>
+<p>wbinfo -g # list all AD groups</p>
+<p>wbinfo --user-groups finance1 # groups finance1 belongs to</p>
+<p>wbinfo -i finance1 # resolve user details</p>
+<p>getent group 'SDWIN\\Finance' # check Finance group members</p>
+<p>getent passwd 'SDWIN\\finance1' # resolve user to Linux UID</p>
+<p><em>⚠ If wbinfo -u returns 'Error looking up domain users', winbind
+cannot reach the DC. Check: sudo systemctl status winbind and ping
+192.168.122.100</em></p>
+</blockquote>
+<p><strong>Part 6: Complete Teardown &amp; Cleanup</strong></p>
+<p>Use this section to undo everything and start fresh. Follow in
+order.</p>
+<p><strong>Step 1 — Remove Ubuntu from the AD Domain</strong></p>
+<blockquote>
+<p>sudo net ads leave -U Administrator</p>
+<p># Enter Administrator password when prompted</p>
+<p><em>⚠ Never delete secrets.ldb when cleaning up — it holds the domain
+join credentials and winbind needs it to connect to the DC. If deleted,
+winbind will fail to start and you must rejoin the domain with net ads
+join.</em></p>
+</blockquote>
+<p><strong>Step 2 — Remove Samba Shares and Data</strong></p>
+<blockquote>
+<p>sudo rm -rf /srv/shares/finance</p>
+<p>sudo rm -rf /srv/shares/hr</p>
+<p>sudo rm -rf /srv/shares/it</p>
+</blockquote>
+<p><strong>Step 3 — Restore Original smb.conf</strong></p>
+<blockquote>
+<p>sudo cp /etc/samba/smb.conf.bak /etc/samba/smb.conf</p>
+<p># Or wipe it entirely and reinstall samba for a clean default:</p>
+<p>sudo apt purge samba winbind libpam-winbind libnss-winbind -y</p>
+<p>sudo apt autoremove -y</p>
+<p>sudo rm -rf /etc/samba /var/lib/samba /var/cache/samba</p>
+</blockquote>
+<p><strong>Step 4 — Clear Samba Cache and Secrets</strong></p>
+<blockquote>
+<p>sudo net cache flush</p>
+<p># Safe cache cleanup — NEVER delete secrets.ldb (holds domain join
+credentials):</p>
+<p>sudo rm -f /var/lib/samba/winbindd_idmap.tdb</p>
+<p>sudo rm -f /var/lib/samba/winbindd_cache.tdb</p>
+</blockquote>
+<p><strong>Step 5 — Revert NSSwitch</strong></p>
+<p>Edit /etc/nsswitch.conf and remove winbind:</p>
+<blockquote>
+<p># Change back to:</p>
+<p>passwd: files systemd</p>
+<p>group: files systemd</p>
+</blockquote>
+<p><strong>Step 6 — Revert Hostname (optional)</strong></p>
+<blockquote>
+<p>sudo hostnamectl set-hostname ubuntu-server</p>
+<p>sudo nano /etc/hosts # remove the SDWIN.LOCAL lines</p>
+</blockquote>
+<p><strong>Step 7 — Stop and Disable Services</strong></p>
+<blockquote>
+<p>sudo systemctl stop smbd nmbd winbind</p>
+<p>sudo systemctl disable smbd nmbd winbind</p>
+</blockquote>
+<p><strong>Reinstall Fresh (to redo from scratch)</strong></p>
+<blockquote>
+<p>sudo apt update</p>
+<p>sudo apt install samba winbind libpam-winbind libnss-winbind -y</p>
+<p># Now follow Part 3 again from the beginning</p>
+</blockquote>
+<p><strong>Troubleshooting Reference</strong></p>
+<table>
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 65%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Error / Symptom</strong></th>
+<th><strong>Fix</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ROLE_STANDALONE in testparm</td>
+<td>security = ADS is missing or set to USER in [global]</td>
+</tr>
+<tr class="even">
+<td>Only allowed for PDC of domain</td>
+<td>security = ADS missing. Ubuntu thinks it's a DC, not a member.</td>
+</tr>
+<tr class="odd">
+<td>NT_STATUS_ACCESS_DENIED despite correct group</td>
+<td>GID mismatch from old autorid mappings. Run: wbinfo --sid-to-gid
+$(wbinfo --name-to-sid 'SDWIN\\Finance') to get correct GID. Use that
+GID directly with chown.</td>
+</tr>
+<tr class="even">
+<td>wbinfo -u: Error looking up domain users</td>
+<td>Winbind can't reach DC. Check: systemctl status winbind, ping
+DC</td>
+</tr>
+<tr class="odd">
+<td>net ads join: Kerberos error</td>
+<td>Clock difference &gt; 5 min. Run: sudo ntpdate 192.168.122.100</td>
+</tr>
+<tr class="even">
+<td>net ads join: Join not valid</td>
+<td>Domain left or machine account deleted in AD. Rejoin with net ads
+join</td>
+</tr>
+<tr class="odd">
+<td>idmap tdb vs autorid confusion</td>
+<td>Use tdb not autorid as the * backend. autorid causes GID
+inconsistency in single-domain labs. Also check spelling: tdb not
+tbd.</td>
+</tr>
+<tr class="even">
+<td>winbind.service: exit-code failure</td>
+<td>Run: sudo winbindd -F -S to see actual error message</td>
+</tr>
+<tr class="odd">
+<td>DNS update failed on join</td>
+<td>/etc/hosts FQDN not listed first, or hostname not set to FQDN</td>
+</tr>
+<tr class="even">
+<td>Unidentified Network on Windows</td>
+<td>No gateway set on Windows NIC, or VM on wrong virtual network</td>
+</tr>
+</tbody>
+</table>
+<p><em>Domain: SDWIN.LOCAL | DC: 192.168.122.100 | File Server:
+192.168.122.181</em></p>
+</body>
+</html>
